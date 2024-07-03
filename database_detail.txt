@@ -1,0 +1,7 @@
+maincompany : MainCompanyID serial p key,CompanyName varchar(200),Date_created timestamp without timezone, logo bytea,other text
+
+roles:RoleID SERIAL P_KEY, MainCompanyID integer, RoleName varchar(100) not null,RolePriviledge not null smallint,
+
+users: UserID serial p_key, MainCompanyID int not null, username varchar(128) not null, password varchar(128) not null,RoleID integer not null,createdAt timestamp_without_timezone
+
+customers: CustomerID serial p_key,,MainCompanyID  int not null,CustomerCompany varchar(256)not null,CompanyContactPerson VARCHAR(128) NOT NULL, ContactNumber1 VARCHAR(16) not null,ContactNumber2 varchar(2),Address text not null,OldDue integer not null, createdAt timestamp without timezone
