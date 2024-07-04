@@ -18,14 +18,14 @@ def get_db_connection():
     )
     return conn
 
-@user_blueprint.route('/users', methods=['POST'])
+@user_blueprint.route('/customers', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 def add_user():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO users (maincompanyid, username, password, roleid, createdat) VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)',
+        'INSERT INTO customers (maincompanyid, customercompany, companycontactperson, contactnumber1, contactnumber2, address, olddue, createdat) VALUES (%s, %s, %s, %s, %s, %s, %s CURRENT_TIMESTAMP)',
         (data['maincompanyid'], data['username'], data['password'], data['roleid'])
     )
     conn.commit()
@@ -33,49 +33,49 @@ def add_user():
     conn.close()
     return jsonify({'status': 'User added'}), 201
 
-@user_blueprint.route('/users', methods=['GET'])
+@user_blueprint.route('/customers', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 def get_users():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM users')
+    cursor.execute('SELECT * FROM customers')
     users = cursor.fetchall()
     cursor.close()
     conn.close()
     return jsonify(users), 200
 
-@user_blueprint.route('/users/<int:id>', methods=['GET'])
+@user_blueprint.route('/customers/<int:id>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 def get_user_by_id(id):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM users WHERE userid = %s', (id,))
+    cursor.execute('SELECT * FROM customers WHERE customerid = %s', (id,))
     user = cursor.fetchone()
     cursor.close()
     conn.close()
     return jsonify(user), 200
 
-@user_blueprint.route('/users/<int:id>', methods=['PUT'])
+@user_blueprint.route('/customers/<int:id>', methods=['PUT'])
 @cross_origin()  # Enable CORS for this route
 def update_user(id):
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        'UPDATE users SET maincompanyid = %s, username = %s, password = %s, roleid = %s WHERE userid = %s',
-        (data['maincompanyid'], data['username'], data['password'], data['roleid'], id)
+        'UPDATE customers SET maincompanyid = %s, customercompany = %s, companycontactperson = %s, contactnumber1 = %s contactnumber2 = %s, address = %s, oldvalue = %s, createdat = %s WHERE customerid = %s',
+        (data['maincompanyid'], data['customercompany'], data['companycontactperson'], data['contactnumber1'],data['contactnumber2'], data['address'],data['olddue'],data['createdat'], id)
     )
     conn.commit()
     cursor.close()
     conn.close()
     return jsonify({'status': 'User updated'}), 200
 
-@user_blueprint.route('/users/<int:id>', methods=['DELETE'])
+@user_blueprint.route('/customers/<int:id>', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 def delete_user(id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('DELETE FROM users WHERE userid = %s', (id,))
+    cursor.execute('DELETE FROM customres WHERE customerid = %s', (id,))
     conn.commit()
     cursor.close()
     conn.close()

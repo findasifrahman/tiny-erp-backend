@@ -1,12 +1,12 @@
 # app.py
 from flask import Flask
-
+from flask_cors import CORS
 from users import user_blueprint
 from maincompany import maincompany_blueprint
 from roles import roles_blueprint
 
 app = Flask(__name__)
-
+CORS(app)  # Enable CORS for all routes
 
 # Register blueprints
 app.register_blueprint(user_blueprint)
