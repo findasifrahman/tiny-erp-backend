@@ -44,7 +44,7 @@ def get_maincompanies():
     conn.close()
     return jsonify(maincompanies), 200
 
-@maincompany_blueprint.route('/maincompany/getbyid/<int:id>', methods=['GET'])
+@maincompany_blueprint.route('/maincompany/<int:id>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 def get_maincompany_by_id(id):
     conn = get_db_connection()
@@ -55,15 +55,16 @@ def get_maincompany_by_id(id):
     conn.close()
     return jsonify(maincompany), 200
 
-@maincompany_blueprint.route('/maincompany/<int:id>', methods=['PUT'])
+@maincompany_blueprint.route('/maincompany/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
-def update_maincompany(id):
+def update_maincompany():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
+    #print("data rcvd in put",data)
     cursor.execute(
         'UPDATE maincompany SET companyname = %s, logo = %s, other = %s WHERE maincompanyid = %s',
-        (data['CompanyName'], data['logo'], data['other'], id)
+        (data['companyname'], data['logo'], data['other'], data['id'])
     )
     conn.commit()
     cursor.close()

@@ -55,15 +55,15 @@ def get_user_by_id(id):
     conn.close()
     return jsonify(user), 200
 
-@user_blueprint.route('/users/<int:id>', methods=['PUT'])
+@user_blueprint.route('/users/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
-def update_user(id):
+def update_user():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
         'UPDATE users SET maincompanyid = %s, username = %s, password = %s, roleid = %s WHERE userid = %s',
-        (data['maincompanyid'], data['username'], data['password'], data['roleid'], id)
+        (data['maincompanyid'], data['username'], data['password'], data['roleid'], data['id'])
     )
     conn.commit()
     cursor.close()

@@ -55,15 +55,15 @@ def get_role_by_id(id):
     conn.close()
     return jsonify(role), 200
 
-@roles_blueprint.route('/roles/<int:id>', methods=['PUT'])
+@roles_blueprint.route('/roles/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
-def update_role(id):
+def update_role():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
         'UPDATE roles SET maincompanyid = %s, rolename = %s, rolepriviledge = %s WHERE roleid = %s',
-        (data['maincompanyid'], data['rolename'], data['rolepriviledge'], id)
+        (data['maincompanyid'], data['rolename'], data['rolepriviledge'], data['id'])
     )
     conn.commit()
     cursor.close()

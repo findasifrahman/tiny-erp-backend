@@ -5,7 +5,7 @@ from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
 
-user_blueprint = Blueprint('users', __name__)
+customer_blueprint = Blueprint('customer', __name__)
 
 load_dotenv()
 
@@ -18,7 +18,7 @@ def get_db_connection():
     )
     return conn
 
-@user_blueprint.route('/customers', methods=['POST'])
+@customer_blueprint.route('/customer', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 def add_user():
     data = request.json
@@ -33,7 +33,7 @@ def add_user():
     conn.close()
     return jsonify({'status': 'User added'}), 201
 
-@user_blueprint.route('/customers', methods=['GET'])
+@customer_blueprint.route('/customer', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 def get_users():
     conn = get_db_connection()
@@ -44,7 +44,7 @@ def get_users():
     conn.close()
     return jsonify(users), 200
 
-@user_blueprint.route('/customers/<int:id>', methods=['GET'])
+@customer_blueprint.route('/customer/<int:id>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 def get_user_by_id(id):
     conn = get_db_connection()
@@ -55,22 +55,22 @@ def get_user_by_id(id):
     conn.close()
     return jsonify(user), 200
 
-@user_blueprint.route('/customers/<int:id>', methods=['PUT'])
+@customer_blueprint.route('/customer/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
-def update_user(id):
+def update_user():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
         'UPDATE customers SET maincompanyid = %s, customercompany = %s, companycontactperson = %s, contactnumber1 = %s contactnumber2 = %s, address = %s, oldvalue = %s, createdat = %s WHERE customerid = %s',
-        (data['maincompanyid'], data['customercompany'], data['companycontactperson'], data['contactnumber1'],data['contactnumber2'], data['address'],data['olddue'],data['createdat'], id)
+        (data['maincompanyid'], data['customercompany'], data['companycontactperson'], data['contactnumber1'],data['contactnumber2'], data['address'],data['olddue'],data['createdat'], data['id'])
     )
     conn.commit()
     cursor.close()
     conn.close()
     return jsonify({'status': 'User updated'}), 200
 
-@user_blueprint.route('/customers/<int:id>', methods=['DELETE'])
+@customer_blueprint.route('/customer/<int:id>', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 def delete_user(id):
     conn = get_db_connection()
