@@ -11,5 +11,45 @@ employee: employyeid serial primary key, maincompanyid int not null, joiningdate
 description text, image bytea, createdat timestamp
 
 salesorder:salesorderid serial p_key,maincompanyid int not null,custometid int not null, customercompany varchar(256) not null, salestype varchar(20) not null, salesagent notnull varchar(128), totalamount float,
-status default pending not null varchar(50), createdat timestamp without time zone
+status default pending not null varchar(50),orderdate timestamp_without_timezone, createdat timestamp without time zone
+
+productcategory: productcategoryid SERIAL PRIMARY KEY,   maincompanyid int not null unchangeable, categoryname varchar(256) not null,  createdat (TIMESTAMP) 
+
+productsubcategory: productsubcategoryid SERIAL PRIMARY KEY,   mainompanyid int not null unchangeable, productcategoryid int not null,categoryname varchar(256) not null,
+subcategoryname varchar(256) not null,  createdat (TIMESTAMP) 
+
+salesorderdetails: (salesorderdetailid serial primary key, maincompanyid int not null unchangeable), salesorderid INT NOT NULL, productcategoryid INT NOT NULL, 
+productcategoryname varchar(256) not null, productsubcategoryid INT not null, productsubcategoryname varchar(256) not null,  quantity INT NOT NULL, unit VARCHAR(12) not null, 
+unitprice DECIMAL(10, 2) NOT NULL, totaldetailprice DECIMAL(10, 2) NOT NULL, description TEXT, salesdate timestamp_without_timezone not null, createdat TIMESTAMP 
+
+paymentsales: paymentid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, custometid INT NOT NULL, paymentdate DATE NOT NULL, 
+amount DECIMAL(10, 2) NOT NULL,receivedby varchar(256) not null, createdat TIMESTAMP
+
+purchasecategory: purchasecategoryid primary key Serial, maincompanyid int not null unchangeable, itemname varchar(128) not null, description TEXT,createdat timestamp
+
+purchasesubcategory: purchasesubcategoryid primary key serial, maincompanyid int not null unchangeable, purchasecategoryid INT not null,categoryname varchar(128),
+ subcategoryname varchar(256) not null, price (double not null),description Text, createdat (TIMESTAMP)
+
+supplier: supplierid PRIMARY KEY serial, maincompanyid int not null unchangeable, suppliercompany varchar(256) not null, suppliercontactname varchar(128) not null, 
+suppliercontactnumber varchar(30) not null, supplieraddress not null varchar(56),description text, createdat (TIMESTAMP)
+
+purchaseorder: purchaseid serial Primary key, maincompanyid int not null unchangeable, supplierid not null INT, 
+totalamount double not null, purchasedby not null varchar(128),date timestamp, createdat (TIMESTAMP)
+
+purchaseorderdetails: purchasedetailid serial primary key, maincompanyid int not null unchangeable, purchaseid INT NOT NULL, purchasecategoryid INT not null, 
+categoryname varchar(256) not null, purchasesubcategoryid INT not null, subcategoryname varchar(256) not null, purchaseamount int not null, purchasequantity int not null,  
+unit varchar(15) NOT NULL ,totalamount numeric not null, createdat (TIMESTAMP)
+
+salarypayroll: payrollid serial not null,  maincompanyid int not null unchangeable, employeeid INT not null, employeename varchar(128) not null, date TimeStamp nut null, 
+salary INT not null, deduction NOT NULL default 0 INT, bonus NOT NULL DEFAULT 0 
+INT, leavetaken not null default 0, finalsalarypaid INT not NULL, createdat (TIMESTAMP)
+
+officeipurchasetemlist: officeipurchasetemlistid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, itemname varchar(256) not null, price INT not null, description TEXT,  
+createdat TIMESTAMP
+
+officeexpenditure: officeexpenditureid Serial primary key, maincompanyid int not null unchangeable, officeipurchasetemlistid INT not null, price INT null, unit not 
+null varchar(15), quantity INT not null, totalamount INT NOT NULL, description text, createdat (TIMESTAMP) 
+
+assets: assetentryid Serial Primary key, maincompanyid int not null unchangeable, assetname varchar(256) not null, description not null TEXT, assetvalue not null INT,
+purchasedate timestamp not null, image bytea, createdat (TIMESTAMP)
 
