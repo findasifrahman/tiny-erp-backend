@@ -4,6 +4,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
+from auth import token_required
 
 roles_blueprint = Blueprint('roles', __name__)
 
@@ -33,20 +34,23 @@ def add_role():
     conn.close()
     return jsonify({'status': 'Role added'}), 201
 
-@roles_blueprint.route('/roles', methods=['GET'])
+@roles_blueprint.route('/roles/<maincompanyid>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
-def get_roles():
+def get_roles(maincompanyid):
+    #maincompanyid = request.args.get('maincompanyid')
+    #if not maincompanyid:
+    #return jsonify({'message': 'MainCompanyID is required'}), 400
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM roles')
+    cursor.execute('SELECT * FROM roles where maincompanyid = %s', (maincompanyid))
     roles = cursor.fetchall()
     cursor.close()
     conn.close()
     return jsonify(roles), 200
 
-@roles_blueprint.route('/roles/<int:id>', methods=['GET'])
+@roles_blueprint.route('/roles/getbyid', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
-def get_role_by_id(id):
+def get_role_by_id():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     cursor.execute('SELECT * FROM roles WHERE roleid = %s', (id,))

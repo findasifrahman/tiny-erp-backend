@@ -4,6 +4,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
+from auth import token_required
 
 user_blueprint = Blueprint('users', __name__)
 
@@ -20,6 +21,7 @@ def get_db_connection():
 
 @user_blueprint.route('/users', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def add_user():
     data = request.json
     conn = get_db_connection()
@@ -35,6 +37,7 @@ def add_user():
 
 @user_blueprint.route('/users', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def get_users():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -46,6 +49,7 @@ def get_users():
 
 @user_blueprint.route('/users/<int:id>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def get_user_by_id(id):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -57,6 +61,7 @@ def get_user_by_id(id):
 
 @user_blueprint.route('/users/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def update_user():
     data = request.json
     conn = get_db_connection()
@@ -72,6 +77,7 @@ def update_user():
 
 @user_blueprint.route('/users/<int:id>', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def delete_user(id):
     conn = get_db_connection()
     cursor = conn.cursor()

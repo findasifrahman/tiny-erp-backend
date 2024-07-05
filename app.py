@@ -49,18 +49,26 @@ def login():
     print(username)
     print(password)
 
+    query = f'''
+    SELECT u.*, r.rolename,m.companyname
+    FROM users u
+    JOIN roles r ON u.roleid = r.roleid
+    JOIN maincompany m ON u.maincompanyid = m.maincompanyid
+    WHERE u.username = %s AND u.password = %s
+    '''
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM users WHERE username = %s AND password = %s', (username, password))
+    cursor.execute(query,(username, password))#('SELECT * FROM users WHERE username = %s AND password = %s', (username, password))
     user = cursor.fetchone()
+    print("login user--",user)
     cursor.close()
     conn.close()
 
     if user:
-        token = generate_token(user['username'])
+        token = generate_token(user['username'], user['rolename'])
         print("generated token--",token)
         print(user)
-        return jsonify({'token': token}), 200
+        return jsonify({'token': token, "maincompanyid": user['maincompanyid'], "maincompanyname": user['companyname'] }), 200
     return jsonify({'message': 'Invalid credentials'}), 401
 
 if __name__ == '__main__':

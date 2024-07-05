@@ -5,12 +5,12 @@ from functools import wraps
 
 SECRET_KEY = 'tinyerp@key2024'
 
-def generate_token(user_id):
+def generate_token(user_id, roles):
     payload = {
         'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes = 900),#datetime.datetime.now() + datetime.timedelta(days=1),
         'iat': datetime.datetime.utcnow() ,#datetime.datetime.now(),
         'user': user_id,
-        'role': 'superadmin'
+        'role': roles
     }
     gen_token = jwt.encode(payload, SECRET_KEY,'HS256')
     return gen_token
@@ -18,7 +18,6 @@ def generate_token(user_id):
 def decode_token(token):
     try:
         payload = jwt.decode(token, SECRET_KEY,'HS256')
-        print("payload is -- ",payload)
         return payload
     except jwt.ExpiredSignatureError:
         return 'Signature expired. Please log in again.'
