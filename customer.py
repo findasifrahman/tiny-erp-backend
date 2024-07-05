@@ -4,6 +4,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
+from auth import token_required
 
 customer_blueprint = Blueprint('customer', __name__)
 
@@ -20,13 +21,14 @@ def get_db_connection():
 
 @customer_blueprint.route('/customer', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def add_user():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO customers (maincompanyid, customercompany, companycontactperson, contactnumber1, contactnumber2, address, olddue, createdat) VALUES (%s, %s, %s, %s, %s, %s, %s CURRENT_TIMESTAMP)',
-        (data['maincompanyid'], data['username'], data['password'], data['roleid'])
+        'INSERT INTO customers (maincompanyid, customercompany, companycontactperson, contactnumber1, contactnumber2, address, olddue, createdat) VALUES (%s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)',
+        (data['maincompanyid'], data['customercompany'], data['companycontactperson'], data['contactnumber1'],data['contactnumber2'], data['address'],data['olddue'])
     )
     conn.commit()
     cursor.close()
@@ -35,6 +37,7 @@ def add_user():
 
 @customer_blueprint.route('/customer', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def get_users():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -46,6 +49,7 @@ def get_users():
 
 @customer_blueprint.route('/customer/<int:id>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def get_user_by_id(id):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -57,13 +61,14 @@ def get_user_by_id(id):
 
 @customer_blueprint.route('/customer/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def update_user():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        'UPDATE customers SET maincompanyid = %s, customercompany = %s, companycontactperson = %s, contactnumber1 = %s contactnumber2 = %s, address = %s, oldvalue = %s, createdat = %s WHERE customerid = %s',
-        (data['maincompanyid'], data['customercompany'], data['companycontactperson'], data['contactnumber1'],data['contactnumber2'], data['address'],data['olddue'],data['createdat'], data['id'])
+        'UPDATE customers SET maincompanyid = %s, customercompany = %s, companycontactperson = %s, contactnumber1 = %s, contactnumber2 = %s, address = %s, olddue = %s WHERE customerid = %s',
+        (data['maincompanyid'], data['customercompany'], data['companycontactperson'], data['contactnumber1'],data['contactnumber2'], data['address'],data['olddue'], data['id'])
     )
     conn.commit()
     cursor.close()
@@ -72,10 +77,11 @@ def update_user():
 
 @customer_blueprint.route('/customer/<int:id>', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def delete_user(id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('DELETE FROM customres WHERE customerid = %s', (id,))
+    cursor.execute('DELETE FROM customers WHERE customerid = %s', (id,))
     conn.commit()
     cursor.close()
     conn.close()

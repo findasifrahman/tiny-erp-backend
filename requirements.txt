@@ -2,3 +2,6 @@ Flask
 psycopg2-binary
 python-dotenv
 flask-cors
+pyjwt
+flask-cors
+

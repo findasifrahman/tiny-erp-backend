@@ -26,7 +26,7 @@ def add_role():
     cursor = conn.cursor()
     cursor.execute(
         'INSERT INTO roles (maincompanyid, rolename, rolepriviledge) VALUES (%s, %s, %s)',
-        (data['MainCompanyID'], data['RoleName'], data['RolePriviledge'])
+        (data['maincompanyid'], data['rolename'], data['rolepriviledge'])
     )
     conn.commit()
     cursor.close()
