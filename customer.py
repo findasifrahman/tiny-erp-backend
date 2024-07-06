@@ -1,28 +1,16 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
-import psycopg2
 from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
-import os
+from dbcon import get_db_connection
 from auth import token_required
 
 customer_blueprint = Blueprint('customer', __name__)
 
-load_dotenv()
-
-def get_db_connection():
-    conn = psycopg2.connect(
-        host=os.getenv('DB_HOST'),
-        database=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASS')
-    )
-    return conn
 
 @customer_blueprint.route('/customer', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def add_user():
+def add_customer():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -35,22 +23,24 @@ def add_user():
     conn.close()
     return jsonify({'status': 'User added'}), 201
 
-@customer_blueprint.route('/customer', methods=['GET'])
+@customer_blueprint.route('/customer/<maincompanyid>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def get_users():
+def get_customers(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM customers')
+    cursor.execute('SELECT * FROM customers where maincompanyid = %s', (maincompanyid))
     users = cursor.fetchall()
+    print("users--",users)
     cursor.close()
     conn.close()
     return jsonify(users), 200
 
-@customer_blueprint.route('/customer/<int:id>', methods=['GET'])
+@customer_blueprint.route('/customer/getbyid', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def get_user_by_id(id):
+def get_customer_by_id():
+    id = request.args.get('id')
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     cursor.execute('SELECT * FROM customers WHERE customerid = %s', (id,))
@@ -62,7 +52,7 @@ def get_user_by_id(id):
 @customer_blueprint.route('/customer/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def update_user():
+def update_customer():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -78,7 +68,7 @@ def update_user():
 @customer_blueprint.route('/customer/<int:id>', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def delete_user(id):
+def delete_customer(id):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('DELETE FROM customers WHERE customerid = %s', (id,))

@@ -2,8 +2,12 @@ import jwt
 import datetime
 from flask import request, jsonify
 from functools import wraps
+from dotenv import load_dotenv
+import os
 
-SECRET_KEY = 'tinyerp@key2024'
+load_dotenv()
+SECRET_KEY = os.getenv('SECRET_KEY')
+
 
 def generate_token(user_id, roles):
     payload = {

@@ -1,26 +1,17 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
-import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-import os
+from dbcon import get_db_connection
 from auth import token_required
 
 roles_blueprint = Blueprint('roles', __name__)
 
-load_dotenv()
 
-def get_db_connection():
-    conn = psycopg2.connect(
-        host=os.getenv('DB_HOST'),
-        database=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASS')
-    )
-    return conn
 
 @roles_blueprint.route('/roles', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def add_role():
     data = request.json
     conn = get_db_connection()
@@ -36,6 +27,7 @@ def add_role():
 
 @roles_blueprint.route('/roles/<maincompanyid>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def get_roles(maincompanyid):
     #maincompanyid = request.args.get('maincompanyid')
     #if not maincompanyid:
@@ -50,7 +42,9 @@ def get_roles(maincompanyid):
 
 @roles_blueprint.route('/roles/getbyid', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def get_role_by_id():
+    id = request.args.get('id')
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     cursor.execute('SELECT * FROM roles WHERE roleid = %s', (id,))
@@ -61,6 +55,7 @@ def get_role_by_id():
 
 @roles_blueprint.route('/roles/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def update_role():
     data = request.json
     conn = get_db_connection()
@@ -76,6 +71,7 @@ def update_role():
 
 @roles_blueprint.route('/roles/<int:id>', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
+@token_required
 def delete_role(id):
     conn = get_db_connection()
     cursor = conn.cursor()

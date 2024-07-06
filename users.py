@@ -1,23 +1,14 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
-import psycopg2
 from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
-import os
 from auth import token_required
+
+from dbcon import get_db_connection
 
 user_blueprint = Blueprint('users', __name__)
 
-load_dotenv()
 
-def get_db_connection():
-    conn = psycopg2.connect(
-        host=os.getenv('DB_HOST'),
-        database=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASS')
-    )
-    return conn
+
 
 @user_blueprint.route('/users', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
@@ -35,22 +26,23 @@ def add_user():
     conn.close()
     return jsonify({'status': 'User added'}), 201
 
-@user_blueprint.route('/users', methods=['GET'])
+@user_blueprint.route('/users/<maincompanyid>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def get_users():
+def get_users(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM users')
+    cursor.execute('SELECT * FROM users where maincompanyid = %s', (maincompanyid))
     users = cursor.fetchall()
     cursor.close()
     conn.close()
     return jsonify(users), 200
 
-@user_blueprint.route('/users/<int:id>', methods=['GET'])
+@user_blueprint.route('/users/getbyid', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def get_user_by_id(id):
+def get_user_by_id():
+    id = request.args.get('id')
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     cursor.execute('SELECT * FROM users WHERE userid = %s', (id,))

@@ -6,13 +6,8 @@ from maincompany import maincompany_blueprint
 from roles import roles_blueprint
 from customer import customer_blueprint
 from auth import generate_token, token_required
-import os
 from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
-import psycopg2
-
-# Load environment variables
-load_dotenv()
+from dbcon import get_db_connection
 
 
 app = Flask(__name__)
@@ -25,14 +20,6 @@ app.register_blueprint(roles_blueprint)
 app.register_blueprint(customer_blueprint )
 
 
-def get_db_connection():
-    conn = psycopg2.connect(
-        host=os.getenv('DB_HOST'),
-        database=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASS')
-    )
-    return conn
 
 # Dummy user data for authentication
 users = {
