@@ -7,10 +7,10 @@ from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 
-customer_blueprint = Blueprint('customer', __name__)
+productcategory_blueprint = Blueprint('productcategory', __name__)
 
 
-@customer_blueprint.route('/productcategory', methods=['POST'])
+@productcategory_blueprint.route('/productcategory', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def add_productcategory():
@@ -26,7 +26,7 @@ def add_productcategory():
     conn.close()
     return jsonify({'status': 'Product Category added'}), 201
 
-@customer_blueprint.route('/productcategory/<maincompanyid>', methods=['GET'])
+@productcategory_blueprint.route('/productcategory/<maincompanyid>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def get_productcategory(maincompanyid):
@@ -38,7 +38,7 @@ def get_productcategory(maincompanyid):
     conn.close()
     return jsonify(users), 200
 
-@customer_blueprint.route('/productcategory/getbyid', methods=['GET'])
+@productcategory_blueprint.route('/productcategory/getbyid', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def get_productcategory_by_id():
@@ -51,7 +51,7 @@ def get_productcategory_by_id():
     conn.close()
     return jsonify(user), 200
 
-@customer_blueprint.route('/productcategory/update', methods=['POST'])
+@productcategory_blueprint.route('/productcategory/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def update_productcategory():
@@ -67,7 +67,7 @@ def update_productcategory():
     conn.close()
     return jsonify({'status': 'Product Category updated'}), 200
 
-@customer_blueprint.route('/productcategory/<int:id>', methods=['DELETE'])
+@productcategory_blueprint.route('/productcategory/<int:id>', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def delete_productcategory(id):

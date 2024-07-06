@@ -8,10 +8,10 @@ from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 
-customer_blueprint = Blueprint('customer', __name__)
+salesorders_blueprint = Blueprint('salesorders', __name__)
 
 
-@customer_blueprint.route('/salesorders', methods=['POST'])
+@salesorders_blueprint.route('/salesorders', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def add_salesorders():
@@ -27,7 +27,7 @@ def add_salesorders():
     conn.close()
     return jsonify({'status': 'Salesorder added'}), 201
 
-@customer_blueprint.route('/salesorders/<maincompanyid>', methods=['GET'])
+@salesorders_blueprint.route('/salesorders/<maincompanyid>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def get_salesorders(maincompanyid):
@@ -40,7 +40,7 @@ def get_salesorders(maincompanyid):
     conn.close()
     return jsonify(users), 200
 
-@customer_blueprint.route('/salesorders/getbyid', methods=['GET'])
+@salesorders_blueprint.route('/salesorders/getbyid', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def get_salesorders_by_id():
@@ -53,7 +53,7 @@ def get_salesorders_by_id():
     conn.close()
     return jsonify(user), 200
 
-@customer_blueprint.route('/salesorders/update', methods=['POST'])
+@salesorders_blueprint.route('/salesorders/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def update_salesorders():
@@ -69,7 +69,7 @@ def update_salesorders():
     conn.close()
     return jsonify({'status': 'Sales Order updated'}), 200
 
-@customer_blueprint.route('/salesorders/<int:id>', methods=['DELETE'])
+@salesorders_blueprint.route('/salesorders/<int:id>', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def delete_salesorders(id):

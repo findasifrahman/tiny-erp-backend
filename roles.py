@@ -1,13 +1,10 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
 from dbcon import get_db_connection
 from auth import token_required
 
 roles_blueprint = Blueprint('roles', __name__)
-
-
 
 @roles_blueprint.route('/roles', methods=['POST'])
 @cross_origin()  # Enable CORS for this route

@@ -8,10 +8,10 @@ from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 
-customer_blueprint = Blueprint('customer', __name__)
+productsubcategory_blueprint = Blueprint('productsubcategory', __name__)
 
 
-@customer_blueprint.route('/productsubcategory', methods=['POST'])
+@productsubcategory_blueprint.route('/productsubcategory', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def add_productsubcategory():
@@ -27,7 +27,7 @@ def add_productsubcategory():
     conn.close()
     return jsonify({'status': 'Product Sub Category added'}), 201
 
-@customer_blueprint.route('/productsubcategory/<maincompanyid>', methods=['GET'])
+@productsubcategory_blueprint.route('/productsubcategory/<maincompanyid>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def get_productsubcategory(maincompanyid):
@@ -39,7 +39,7 @@ def get_productsubcategory(maincompanyid):
     conn.close()
     return jsonify(users), 200
 
-@customer_blueprint.route('/productsubcategory/getbyid', methods=['GET'])
+@productsubcategory_blueprint.route('/productsubcategory/getbyid', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def get_productsubcategory_by_id():
@@ -52,7 +52,7 @@ def get_productsubcategory_by_id():
     conn.close()
     return jsonify(user), 200
 
-@customer_blueprint.route('/productsubcategory/update', methods=['POST'])
+@productsubcategory_blueprint.route('/productsubcategory/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def update_productsubcategory():
@@ -68,7 +68,7 @@ def update_productsubcategory():
     conn.close()
     return jsonify({'status': 'Product Sub Category updated'}), 200
 
-@customer_blueprint.route('/productsubcategory/<int:id>', methods=['DELETE'])
+@productsubcategory_blueprint.route('/productsubcategory/<int:id>', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 @token_required
 def delete_productsubcategory(id):

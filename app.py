@@ -9,6 +9,22 @@ from auth import generate_token, token_required
 from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 
+from employee import employee_blueprint
+from salesorders import salesorders_blueprint
+from productcategory import productcategory_blueprint
+from productsubcategory import productsubcategory_blueprint
+from salesorderdetails import salesorderdetails_blueprint
+from paymentsales import paymentsales_blueprint
+from purchasecategory import purchasecategory_blueprint
+from purchasesubcategory import purchasesubcategory_blueprint
+from supplier import supplier_blueprint
+from purchaseorder import purchaseorder_blueprint
+from purchaseorderdetail import purchaseorderdetail_blueprint
+from salarypayroll import salarypayroll_blueprint
+from officepurchaseitemlist import officepurchaseitemlist_blueprint
+from officeexpenditure import officeexpenditure_blueprint
+from assets import assets_blueprint
+
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -18,6 +34,22 @@ app.register_blueprint(user_blueprint)
 app.register_blueprint(maincompany_blueprint)
 app.register_blueprint(roles_blueprint)
 app.register_blueprint(customer_blueprint )
+
+app.register_blueprint(employee_blueprint)
+app.register_blueprint(salesorders_blueprint)
+app.register_blueprint(salesorderdetails_blueprint)
+app.register_blueprint(productcategory_blueprint)
+app.register_blueprint(productsubcategory_blueprint)
+app.register_blueprint(paymentsales_blueprint)
+app.register_blueprint(purchasecategory_blueprint)
+app.register_blueprint(purchasesubcategory_blueprint)
+app.register_blueprint(supplier_blueprint)
+app.register_blueprint(purchaseorder_blueprint)
+app.register_blueprint(purchaseorderdetail_blueprint)
+app.register_blueprint(salarypayroll_blueprint)
+app.register_blueprint(officepurchaseitemlist_blueprint)
+app.register_blueprint(officeexpenditure_blueprint)
+app.register_blueprint(assets_blueprint)
 
 
 
