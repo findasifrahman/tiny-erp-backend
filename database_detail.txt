@@ -44,7 +44,7 @@ salarypayroll: payrollid serial not null,  maincompanyid int not null unchangeab
 salary INT not null, deduction NOT NULL default 0 INT, bonus NOT NULL DEFAULT 0 
 INT, leavetaken not null default 0, finalsalarypaid INT not NULL, createdat (TIMESTAMP)
 
-officeipurchasetemlist: officepurchaseitemlistid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, itemname varchar(256) not null, price INT not null, description TEXT,  
+officepurchaseitemlist: officepurchaseitemlistid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, itemname varchar(256) not null, price INT not null, description TEXT,  
 createdat TIMESTAMP
 
 officeexpenditure: officeexpenditureid Serial primary key, maincompanyid int not null unchangeable, officepurchaseitemlistid INT not null, price INT null, unit not 
