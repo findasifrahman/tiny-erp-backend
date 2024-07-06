@@ -56,7 +56,7 @@ def get_salesorders_by_id():
 @customer_blueprint.route('/salesorders/update', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def update_salesorders_customer():
+def update_salesorders():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -67,16 +67,16 @@ def update_salesorders_customer():
     conn.commit()
     cursor.close()
     conn.close()
-    return jsonify({'status': 'User updated'}), 200
+    return jsonify({'status': 'Sales Order updated'}), 200
 
 @customer_blueprint.route('/salesorders/<int:id>', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def delete_salesorders_customer(id):
+def delete_salesorders(id):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('DELETE FROM salesorder WHERE salesorderid = %s', (id,))
     conn.commit()
     cursor.close()
     conn.close()
-    return jsonify({'status': 'User deleted'}), 200
+    return jsonify({'status': 'Sales order deleted'}), 200
