@@ -2,12 +2,12 @@ maincompany : maincompanyid serial p key,companyname varchar(200),datecreated ti
 
 roles:roleid SERIAL P_KEY, maincompanyid integer, rolename varchar(100) not null,rolepriviledge not null smallint
 
-users: userid serial p_key, maincompanyid int not null, username varchar(128) not null, password varchar(128) not null,roleid integer not null,createdat timestamp_without_timezone
+users: userid serial p_key, maincompanyid int not null, username varchar(128) not null, password varchar(128) not null,roleid varchar(20) not null,createdat timestamp_without_timezone
 
 customers: customerid serial p_key,,maincompanyid  int not null,customercompany varchar(256)not null,companycontactperson VARCHAR(128) NOT NULL, contactnumber1 VARCHAR(16) not null,contactnumber2 varchar(2),address text not null,olddue integer not null, createdat timestamp without timezone
 
 employee: employyeid serial primary key, maincompanyid int not null, joiningdate timestamp not null,
-  employeename varchar(128) not null, age int noy null, contactno varchar(30) not null, address varchar(256) not null, nidnumber varchar (20), salary int not null, grade varchar(10), roleid int not null, state varchar(20),
+  employeename varchar(128) not null, age int noy null, contactno varchar(30) not null, address varchar(256) not null, nidnumber varchar (20), salary int not null, grade varchar(10), roleid varchar(20) not null, state varchar(20),
 description text, image bytea, createdat timestamp
 
 salesorder:salesorderid serial p_key,maincompanyid int not null,customerid int not null, customercompany varchar(256) not null, salestype varchar(20) not null, salesagent notnull varchar(128), totalamount float,
