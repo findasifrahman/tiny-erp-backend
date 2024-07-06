@@ -44,10 +44,10 @@ salarypayroll: payrollid serial not null,  maincompanyid int not null unchangeab
 salary INT not null, deduction NOT NULL default 0 INT, bonus NOT NULL DEFAULT 0 
 INT, leavetaken not null default 0, finalsalarypaid INT not NULL, createdat (TIMESTAMP)
 
-officeipurchasetemlist: officeipurchasetemlistid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, itemname varchar(256) not null, price INT not null, description TEXT,  
+officeipurchasetemlist: officepurchaseitemlistid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, itemname varchar(256) not null, price INT not null, description TEXT,  
 createdat TIMESTAMP
 
-officeexpenditure: officeexpenditureid Serial primary key, maincompanyid int not null unchangeable, officeipurchasetemlistid INT not null, price INT null, unit not 
+officeexpenditure: officeexpenditureid Serial primary key, maincompanyid int not null unchangeable, officepurchaseitemlistid INT not null, price INT null, unit not 
 null varchar(15), quantity INT not null, totalamount INT NOT NULL, description text, createdat (TIMESTAMP) 
 
 assets: assetentryid Serial Primary key, maincompanyid int not null unchangeable, assetname varchar(256) not null, description not null TEXT, assetvalue not null INT,

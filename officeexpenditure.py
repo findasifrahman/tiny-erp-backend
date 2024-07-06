@@ -17,9 +17,9 @@ def add_officeexpenditure(user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        '''INSERT INTO officeexpenditure (maincompanyid, officeipurchasetemlistid, price, unit, quantity, totalamount, description,date, createdat) 
+        '''INSERT INTO officeexpenditure (maincompanyid, officepurchaseitemlistid, price, unit, quantity, totalamount, description,date, createdat) 
            VALUES (%s, %s, %s, %s, %s, %s, %s,%s, CURRENT_TIMESTAMP)''',
-        (data['maincompanyid'], data['officeipurchasetemlistid'], data['price'], data['unit'], data['quantity'], data['totalamount'], data['description'], data['date'])
+        (data['maincompanyid'], data['officepurchaseitemlistid'], data['price'], data['unit'], data['quantity'], data['totalamount'], data['description'], data['date'])
     )
     conn.commit()
     cursor.close()
@@ -61,9 +61,9 @@ def update_officeexpenditure():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        '''UPDATE officeexpenditure SET officeipurchasetemlistid = %s, price = %s, unit = %s, quantity = %s, totalamount = %s, description = %s, date = %s 
+        '''UPDATE officeexpenditure SET officepurchaseitemlistid = %s, price = %s, unit = %s, quantity = %s, totalamount = %s, description = %s, date = %s 
            WHERE officeexpenditureid = %s''',
-        (data['officeipurchasetemlistid'], data['price'], data['unit'], data['quantity'], data['totalamount'], data['description'],data['date'], data['id'])
+        (data['officepurchaseitemlistid'], data['price'], data['unit'], data['quantity'], data['totalamount'], data['description'],data['date'], data['id'])
     )
     conn.commit()
     cursor.close()
