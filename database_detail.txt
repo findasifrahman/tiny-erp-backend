@@ -10,7 +10,8 @@ employee: employyeid serial primary key, maincompanyid int not null, joiningdate
   employeename varchar(128) not null, age int noy null, contactno varchar(30) not null, address varchar(256) not null, nidnumber varchar (20), salary int not null, grade varchar(10), roleid varchar(20) not null, state varchar(20),
 description text, image bytea, createdat timestamp
 
-salesorder:salesorderid serial p_key,maincompanyid int not null,customerid int not null, customercompany varchar(256) not null, salestype varchar(20) not null, salesagent notnull varchar(128), totalamount float,
+salesorder:salesorderid serial p_key,maincompanyid int not null,customerid int not null, customercompany varchar(256) not null, salestype varchar(20) not null,
+salesagentid integer, salesagent notnull varchar(128), totalamount float,
 status default pending not null varchar(50),orderdate timestamp_without_timezone, createdat timestamp without time zone
 
 productcategory: productcategoryid SERIAL PRIMARY KEY,   maincompanyid int not null unchangeable, categoryname varchar(256) not null,  createdat (TIMESTAMP) 

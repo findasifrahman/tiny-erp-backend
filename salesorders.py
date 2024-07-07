@@ -19,8 +19,8 @@ def add_salesorders():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO salesorder (maincompanyid, customerid, customercompany, salestype, salesagent, totalamount, status, orderdate, createdat) VALUES (%s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)',
-        (data['maincompanyid'], data['customerid'], data['customercompany'], data['salestype'],data['salesagent'], data['totalamount'],data['status'],data['orderdate'])
+        'INSERT INTO salesorder (maincompanyid, customerid, customercompany, salestype, salesagentid, salesagent, totalamount, status, orderdate, createdat) VALUES (%s, %s, %s, %s, %s, %s, %s,%s, %s, CURRENT_TIMESTAMP)',
+        (data['maincompanyid'], data['customerid'], data['customercompany'], data['salestype'], data['salesagentid'], data['salesagent'], data['totalamount'],data['status'],data['orderdate'])
     )
     conn.commit()
     cursor.close()
@@ -61,8 +61,8 @@ def update_salesorders():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        'UPDATE salesorder SET maincompanyid = %s, customerid = %s, customercompany = %s, salestype = %s, salesagent = %s, totalamount = %s, status = %s, orderdate= %s WHERE salesorderid = %s',
-        (data['maincompanyid'], data['customerid'], data['customercompany'], data['salestype'],data['salesagent'], data['totalamount'],data['status'],data['orderdate'], data['id'])
+        'UPDATE salesorder SET maincompanyid = %s, customerid = %s, customercompany = %s, salestype = %s,salesagentid = %s, salesagent = %s, totalamount = %s, status = %s, orderdate= %s WHERE salesorderid = %s',
+        (data['maincompanyid'], data['customerid'], data['customercompany'], data['salestype'],data['salesagentid'] ,data['salesagent'], data['totalamount'],data['status'],data['orderdate'], data['id'])
     )
     conn.commit()
     cursor.close()
