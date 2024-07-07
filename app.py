@@ -69,9 +69,8 @@ def login():
     print(password)
 
     query = f'''
-    SELECT u.*, r.rolename,m.companyname
+    SELECT u.*, m.companyname
     FROM users u
-    JOIN roles r ON u.roleid = r.roleid
     JOIN maincompany m ON u.maincompanyid = m.maincompanyid
     WHERE u.username = %s AND u.password = %s
     '''
@@ -84,7 +83,7 @@ def login():
     conn.close()
 
     if user:
-        token = generate_token(user['username'], user['rolename'])
+        token = generate_token(user['username'], user['roleid'])
         print("generated token--",token)
         print(user)
         return jsonify({'token': token, "maincompanyid": user['maincompanyid'], "maincompanyname": user['companyname'] }), 200

@@ -12,7 +12,6 @@ user_blueprint = Blueprint('users', __name__)
 
 @user_blueprint.route('/users', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
-@token_required
 def add_user():
     data = request.json
     conn = get_db_connection()
