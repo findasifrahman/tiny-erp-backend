@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from dbcon import get_db_connection
 from psycopg2.extras import RealDictCursor
-
+import psycopg2
 from auth import token_required
 
 officeexpenditure_blueprint = Blueprint('officeexpenditure', __name__)
@@ -74,10 +74,20 @@ def update_officeexpenditure():
 @cross_origin()
 @token_required
 def delete_officeexpenditure(user_id, id):
+    # Implement the logic to delete an employee by id
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('DELETE FROM officeexpenditure WHERE officeexpenditureid = %s', (id,))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({'status': 'Office Expenditure deleted'}), 200
+    error = False
+    try:
+        cursor.execute('DELETE FROM officeexpenditure WHERE officeexpenditureid = %s', (id,))
+        conn.commit()
+    except psycopg2.Error as e:
+        error =True
+        conn.rollback()
+        print("error test is --",e)
+        return jsonify({'message': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+        if not error:
+            return jsonify({'status': 'Office Expenditure deleted'}), 200

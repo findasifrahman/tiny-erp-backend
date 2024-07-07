@@ -6,7 +6,7 @@ from flask_cors import cross_origin
 from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
-
+import psycopg2
 assets_blueprint = Blueprint('assets', __name__)
 
 
@@ -77,8 +77,17 @@ def update_asset():
 def delete_asset(id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('DELETE FROM assets WHERE assetentryid = %s', (id,))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({'status': 'Asset deleted'}), 200
+    error = False
+    try:
+        cursor.execute('DELETE FROM assets WHERE assetentryid = %s', (id,))
+        conn.commit()
+    except psycopg2.Error as e:
+        error =True
+        conn.rollback()
+        print("error test is --",e)
+        return jsonify({'message': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+        if not error:
+            return jsonify({'status': 'Assets deleted'}), 200

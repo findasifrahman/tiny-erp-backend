@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from dbcon import get_db_connection
 from psycopg2.extras import RealDictCursor
-
+import psycopg2
 from auth import token_required
 
 purchasecategory_blueprint = Blueprint('purchasecategory', __name__)
@@ -78,8 +78,17 @@ def update_purchasecategory():
 def delete_purchasecategory( id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('DELETE FROM purchasecategory WHERE purchasecategoryid = %s', (id,))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({'status': 'Purchase Category deleted'}), 200
+    error = False
+    try:
+        cursor.execute('DELETE FROM purchasecategory WHERE purchasecategoryid = %s', (id,))
+        conn.commit()
+    except psycopg2.Error as e:
+        error =True
+        conn.rollback()
+        print("error test is --",e)
+        return jsonify({'message': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+        if not error:
+            return jsonify({'status': 'Purchase Category deleted'}), 200

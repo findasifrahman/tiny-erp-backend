@@ -8,7 +8,7 @@ from flask_cors import cross_origin
 from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
-
+import psycopg2
 salarypayroll_blueprint = Blueprint('salarypayroll', __name__)
 
 
@@ -79,8 +79,17 @@ def update_salarypayroll():
 def delete_salarypayroll(user_id, id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('DELETE FROM salarypayroll WHERE payrollid = %s', (id,))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({'status': 'Salary Payroll deleted'}), 200
+    error = False
+    try:
+        cursor.execute('DELETE FROM salarypayroll WHERE payrollid = %s', (id,))
+        conn.commit()
+    except psycopg2.Error as e:
+        error =True
+        conn.rollback()
+        print("error test is --",e)
+        return jsonify({'message': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+        if not error:
+            return jsonify({'status': 'Salary Payroll deleted'}), 200
