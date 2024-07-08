@@ -12,7 +12,7 @@ officeexpenditure_blueprint = Blueprint('officeexpenditure', __name__)
 @officeexpenditure_blueprint.route('/officeexpenditure', methods=['POST'])
 @cross_origin()
 @token_required
-def add_officeexpenditure(user_id):
+def add_officeexpenditure():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -32,7 +32,15 @@ def add_officeexpenditure(user_id):
 def get_officeexpenditures(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM officeexpenditure where maincompanyid = %s', (maincompanyid))
+    # updated by asif
+    query = '''
+    SELECT p.*, r.itemname
+    FROM officeexpenditure p
+    JOIN officepurchaseitemlist r ON p.officepurchaseitemlistid = r.officepurchaseitemlistid
+    WHERE p.maincompanyid = %s
+    '''
+    # ############################
+    cursor.execute(query, (maincompanyid))
     officeexpenditures = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -73,7 +81,7 @@ def update_officeexpenditure():
 @officeexpenditure_blueprint.route('/officeexpenditure/<int:id>', methods=['DELETE'])
 @cross_origin()
 @token_required
-def delete_officeexpenditure(user_id, id):
+def delete_officeexpenditure(id):
     # Implement the logic to delete an employee by id
     conn = get_db_connection()
     cursor = conn.cursor()

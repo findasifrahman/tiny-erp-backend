@@ -6,7 +6,7 @@ users: userid serial p_key, maincompanyid int not null, username varchar(128) no
 
 customers: customerid serial p_key,,maincompanyid  int not null,customercompany varchar(256)not null,companycontactperson VARCHAR(128) NOT NULL, contactnumber1 VARCHAR(16) not null,contactnumber2 varchar(2),address text not null,olddue integer not null, createdat timestamp without timezone
 
-employee: employyeid serial primary key, maincompanyid int not null, joiningdate timestamp not null,
+employee: employeeid serial primary key, maincompanyid int not null, joiningdate timestamp not null,
   employeename varchar(128) not null, age int noy null, contactno varchar(30) not null, address varchar(256) not null, nidnumber varchar (20), salary int not null, grade varchar(10), roleid varchar(20) not null, state varchar(20),
 description text, image bytea, createdat timestamp
 
@@ -46,12 +46,18 @@ salarypayroll: payrollid serial not null,  maincompanyid int not null unchangeab
 salary INT not null, deduction NOT NULL default 0 INT, bonus NOT NULL DEFAULT 0 
 INT, leavetaken not null default 0, finalsalarypaid INT not NULL, createdat (TIMESTAMP)
 
-officepurchaseitemlist: officepurchaseitemlistid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, itemname varchar(256) not null, price INT not null, description TEXT,  
+officepurchaseitemlist: officepurchaseitemlistid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, itemname varchar(256) not null, 
+price INT not null, description TEXT,  
 createdat TIMESTAMP
 
-officeexpenditure: officeexpenditureid Serial primary key, maincompanyid int not null unchangeable, officepurchaseitemlistid INT not null, price INT null, unit not 
-null varchar(15), quantity INT not null, totalamount INT NOT NULL, description text, createdat (TIMESTAMP) 
+officeexpenditure: officeexpenditureid Serial primary key, maincompanyid int not null unchangeable, officepurchaseitemlistid INT not null, price INT NOT null, 
+unit not null varchar(15), quantity INT not null, totalamount INT NOT NULL, description text, createdat (TIMESTAMP), date timestamp 
 
 assets: assetentryid Serial Primary key, maincompanyid int not null unchangeable, assetname varchar(256) not null, description not null TEXT, assetvalue not null INT,
 purchasedate timestamp not null, image bytea, createdat (TIMESTAMP)
+
+productstock: productstockid int primary key, maincompanyid int not null unchangeable, purchasecategoryid int not null,
+    purchasesubcategoryid int not null, quantity not null Int, unit not null varchar(15),entrydate timestamp, 
+    status not null varchar(100),description text, 
+    createdat (TIMESTAMP)
 

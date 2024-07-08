@@ -57,10 +57,11 @@ def get_officepurchaseitemlist_by_id():
 @officepurchaseitemlist_blueprint.route('/officepurchaseitemlist/update', methods=['POST'])
 @cross_origin()
 @token_required
-def update_officepurchaseitemlist(user_id, id):
+def update_officepurchaseitemlist():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
+    print("data in update is --",data)
     cursor.execute(
         '''UPDATE officepurchaseitemlist SET itemname = %s, price = %s, description = %s 
            WHERE officepurchaseitemlistid = %s''',
@@ -74,7 +75,7 @@ def update_officepurchaseitemlist(user_id, id):
 @officepurchaseitemlist_blueprint.route('/officepurchaseitemlist/<int:id>', methods=['DELETE'])
 @cross_origin()
 @token_required
-def delete_officepurchaseitemlist(user_id, id):
+def delete_officepurchaseitemlist(id):
     # Implement the logic to delete an employee by id
     conn = get_db_connection()
     cursor = conn.cursor()
