@@ -8,6 +8,7 @@ from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
+from datetime import datetime
 salesorders_blueprint = Blueprint('salesorders', __name__)
 
 
@@ -89,3 +90,19 @@ def delete_salesorders(id):
         conn.close()
         if not error:
             return jsonify({'status': 'Sales order deleted'}), 200
+        
+@salesorders_blueprint.route('/salesorders/getbydate', methods=['GET'])
+@cross_origin()  # Enable CORS for this route
+def getByDate_salesorders():
+    id = request.args.get('id')
+    dated = request.args.get('dated')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    print("dated--",dated)
+    print("maincompanyid--",id)
+    #cursor.execute('SELECT * FROM salesorder WHERE orderdate BETWEEN %s AND %s', (id,))
+    cursor.execute('SELECT * FROM salesorder WHERE maincompanyid = %s AND orderdate > %s', (id, datetime.strptime(dated, '%Y-%m-%d').date()))
+    user = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(user), 200

@@ -21,7 +21,7 @@ subcategoryname varchar(256) not null,  createdat (TIMESTAMP)
 
 salesorderdetails: (salesorderdetailid serial primary key, maincompanyid int not null unchangeable), salesorderid INT NOT NULL, productcategoryid INT NOT NULL, 
 productcategoryname varchar(256) not null, productsubcategoryid INT not null, productsubcategoryname varchar(256) not null,  quantity INT NOT NULL, unit VARCHAR(12) not null, 
-unitprice DECIMAL(10, 2) NOT NULL, totaldetailprice DECIMAL(10, 2) NOT NULL, description TEXT, salesdate timestamp_without_timezone not null, createdat TIMESTAMP 
+unitprice DECIMAL(10, 2) NOT NULL, totaldetailprice DECIMAL(10, 2) NOT NULL, description TEXT, createdat TIMESTAMP 
 
 paymentsales: paymentid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, custometid INT NOT NULL, paymentdate DATE NOT NULL, 
 amount DECIMAL(10, 2) NOT NULL,receivedby varchar(256) not null, createdat TIMESTAMP

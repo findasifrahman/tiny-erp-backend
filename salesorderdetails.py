@@ -1,6 +1,6 @@
 #salesorderdetails: (salesorderdetailid serial primary key, maincompanyid int not null unchangeable), salesorderid INT NOT NULL, productcategoryid INT NOT NULL, 
 #productcategoryname varchar(256) not null, productsubcategoryid INT not null, productsubcategoryname varchar(256) not null,  quantity INT NOT NULL, unit VARCHAR(12) not null, 
-#unitprice DECIMAL(10, 2) NOT NULL, totaldetailprice DECIMAL(10, 2) NOT NULL, description TEXT, salesdate timestamp_without_timezone not null, createdat TIMESTAMP
+#unitprice DECIMAL(10, 2) NOT NULL, totaldetailprice DECIMAL(10, 2) NOT NULL, description TEXT createdat TIMESTAMP
 
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
@@ -18,9 +18,9 @@ def add_salesorderdetail():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        '''INSERT INTO salesorderdetails (maincompanyid, salesorderid, productcategoryid, productcategoryname, productsubcategoryid, productsubcategoryname, quantity, unit, unitprice, totaldetailprice, description, salesdate, createdat) 
-           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)''',
-        (data['maincompanyid'], data['salesorderid'], data['productcategoryid'], data['productcategoryname'], data['productsubcategoryid'], data['productsubcategoryname'], data['quantity'], data['unit'], data['unitprice'], data['totaldetailprice'], data['description'], data['salesdate'])
+        '''INSERT INTO salesorderdetails (maincompanyid, salesorderid, productcategoryid, productcategoryname, productsubcategoryid, productsubcategoryname, quantity, unit, unitprice, totaldetailprice, description, createdat) 
+           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)''',
+        (data['maincompanyid'], data['salesorderid'], data['productcategoryid'], data['productcategoryname'], data['productsubcategoryid'], data['productsubcategoryname'], data['quantity'], data['unit'], data['unitprice'], data['totaldetailprice'], data['description'])
     )
     conn.commit()
     cursor.close()
@@ -62,9 +62,9 @@ def update_salesorderdetail():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        '''UPDATE salesorderdetails SET salesorderid = %s, productcategoryid = %s, productcategoryname = %s, productsubcategoryid = %s, productsubcategoryname = %s, quantity = %s, unit = %s, unitprice = %s, totaldetailprice = %s, description = %s, salesdate = %s 
+        '''UPDATE salesorderdetails SET salesorderid = %s, productcategoryid = %s, productcategoryname = %s, productsubcategoryid = %s, productsubcategoryname = %s, quantity = %s, unit = %s, unitprice = %s, totaldetailprice = %s, description = %s
            WHERE salesorderdetailid = %s''',
-        (data['salesorderid'], data['productcategoryid'], data['productcategoryname'], data['productsubcategoryid'], data['productsubcategoryname'], data['quantity'], data['unit'], data['unitprice'], data['totaldetailprice'], data['description'], data['salesdate'], data['id'])
+        (data['salesorderid'], data['productcategoryid'], data['productcategoryname'], data['productsubcategoryid'], data['productsubcategoryname'], data['quantity'], data['unit'], data['unitprice'], data['totaldetailprice'], data['description'], data['id'])
     )
     conn.commit()
     cursor.close()
