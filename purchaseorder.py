@@ -7,6 +7,7 @@ from psycopg2.extras import RealDictCursor
 from auth import token_required
 from dbcon import get_db_connection
 import psycopg2
+from datetime import datetime
 purchaseorder_blueprint = Blueprint('purchaseorder', __name__)
 
 
@@ -33,8 +34,18 @@ def add_purchaseorder():
 def get_purchaseorders(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM purchaseorder where maincompanyid = %s', (maincompanyid))
+    # updated by asif
+    query = '''
+    SELECT p.*, r.suppliercompany
+    FROM purchaseorder p
+    JOIN supplier r ON p.supplierid = r.supplierid
+    WHERE p.maincompanyid = %s
+    '''
+    # ############################
+    #cursor.execute('SELECT * FROM purchaseorder where maincompanyid = %s', (maincompanyid))
+    cursor.execute(query, (maincompanyid))
     purchaseorders = cursor.fetchall()
+    print("purchaseorders--",purchaseorders)
     cursor.close()
     conn.close()
     return jsonify(purchaseorders), 200
@@ -91,3 +102,20 @@ def delete_purchaseorder(id):
         conn.close()
         if not error:
             return jsonify({'status': 'Purchase Order deleted'}), 200
+        
+
+@purchaseorder_blueprint.route('/purchaseorder/getbydate', methods=['GET'])
+@cross_origin()  # Enable CORS for this route
+def getByDate_purchaseorders():
+    id = request.args.get('id')
+    dated = request.args.get('dated')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    print("dated--",dated)
+    print("maincompanyid--",id)
+    #cursor.execute('SELECT * FROM salesorder WHERE orderdate BETWEEN %s AND %s', (id,))
+    cursor.execute('SELECT * FROM purchaseorder WHERE maincompanyid = %s AND date > %s', (id, datetime.strptime(dated, '%Y-%m-%d').date()))
+    user = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(user), 200

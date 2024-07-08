@@ -23,8 +23,9 @@ salesorderdetails: (salesorderdetailid serial primary key, maincompanyid int not
 productcategoryname varchar(256) not null, productsubcategoryid INT not null, productsubcategoryname varchar(256) not null,  quantity INT NOT NULL, unit VARCHAR(12) not null, 
 unitprice DECIMAL(10, 2) NOT NULL, totaldetailprice DECIMAL(10, 2) NOT NULL, description TEXT, createdat TIMESTAMP 
 
-paymentsales: paymentid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, custometid INT NOT NULL, paymentdate DATE NOT NULL, 
-amount DECIMAL(10, 2) NOT NULL,receivedby varchar(256) not null, createdat TIMESTAMP
+paymentsales: paymentid SERIAL PRIMARY KEY, maincompanyid int not null unchangeable, customerid INT NOT NULL, paymentdate DATE NOT NULL, 
+amount DECIMAL(10, 2) NOT NULL,recievedbyid INTEGER not null,receivedby varchar(256), createdat TIMESTAMP, customercompany varchar(256) not null,
+salesorderid int, description text
 
 purchasecategory: purchasecategoryid primary key Serial, maincompanyid int not null unchangeable, itemname varchar(128) not null, description TEXT,createdat timestamp
 

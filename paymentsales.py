@@ -18,9 +18,9 @@ def add_paymentsales():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        '''INSERT INTO paymentsales (maincompanyid, customerid, paymentdate, amount, receivedby, createdat) 
-           VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)''',
-        (data['maincompanyid'], data['customerid'], data['paymentdate'], data['amount'], data['receivedby'])
+        '''INSERT INTO paymentsales (maincompanyid, customerid, customercompany, paymentdate, amount, recievedbyid, receivedby, salesorderid,description, createdat) 
+           VALUES (%s, %s, %s, %s, %s, %s,%s, %s, %s, CURRENT_TIMESTAMP)''',
+        (data['maincompanyid'], data['customerid'], data['customercompany'], data['paymentdate'], data['amount'], data['recievedbyid'], data['receivedby'], data['salesorderid'], data['description'])
     )
     conn.commit()
     cursor.close()
@@ -57,14 +57,15 @@ def get_paymentsales_by_id():
 @paymentsales_blueprint.route('/paymentsales/update', methods=['POST'])
 @cross_origin()
 @token_required
-def update_paymentsales( id):
+def update_paymentsales():
     data = request.json
     conn = get_db_connection()
     cursor = conn.cursor()
+    print("data is --",data)
     cursor.execute(
-        '''UPDATE paymentsales SET customerid = %s, paymentdate = %s, amount = %s, receivedby = %s 
+        '''UPDATE paymentsales SET customerid = %s,customercompany = %s, paymentdate = %s, amount = %s,recievedbyid = %s, receivedby = %s, salesorderid = %s, description = %s 
            WHERE paymentid = %s''',
-        (data['customerid'], data['paymentdate'], data['amount'], data['receivedby'], data['id'])
+        (data['customerid'], data['customercompany'], data['paymentdate'], data['amount'],data['recievedbyid'], data['receivedby'],data['salesorderid'], data['description'], data['id'])
     )
     conn.commit()
     cursor.close()
