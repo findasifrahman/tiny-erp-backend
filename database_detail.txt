@@ -56,8 +56,8 @@ unit not null varchar(15), quantity INT not null, totalamount INT NOT NULL, desc
 assets: assetentryid Serial Primary key, maincompanyid int not null unchangeable, assetname varchar(256) not null, description not null TEXT, assetvalue not null INT,
 purchasedate timestamp not null, image bytea, createdat (TIMESTAMP)
 
-productstock: productstockid int primary key, maincompanyid int not null unchangeable, purchasecategoryid int not null,
-    purchasesubcategoryid int not null, quantity not null Int, unit not null varchar(15),entrydate timestamp, 
+productstock: productstockid int primary key, maincompanyid int not null unchangeable, productcategoryid int not null,
+    productsubcategoryid int not null, quantity not null Int, unit not null varchar(15),entrydate timestamp, 
     status not null varchar(100),description text, 
     createdat (TIMESTAMP)
 

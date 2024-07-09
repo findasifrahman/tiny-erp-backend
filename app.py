@@ -24,6 +24,7 @@ from salarypayroll import salarypayroll_blueprint
 from officepurchaseitemlist import officepurchaseitemlist_blueprint
 from officeexpenditure import officeexpenditure_blueprint
 from assets import assets_blueprint
+from productstock import productstock_blueprint
 
 
 app = Flask(__name__)
@@ -50,7 +51,7 @@ app.register_blueprint(salarypayroll_blueprint)
 app.register_blueprint(officepurchaseitemlist_blueprint)
 app.register_blueprint(officeexpenditure_blueprint)
 app.register_blueprint(assets_blueprint)
-
+app.register_blueprint(productstock_blueprint)
 
 
 # Dummy user data for authentication
