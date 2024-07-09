@@ -3,7 +3,7 @@ from flask_cors import cross_origin
 from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
-
+import psycopg2
 roles_blueprint = Blueprint('roles', __name__)
 
 @roles_blueprint.route('/roles', methods=['POST'])
@@ -66,14 +66,30 @@ def update_role():
     conn.close()
     return jsonify({'status': 'Role updated'}), 200
 
-@roles_blueprint.route('/roles/<int:id>', methods=['DELETE'])
+@roles_blueprint.route('/roles', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def delete_role(id):
+def delete_role():
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('DELETE FROM roles WHERE roleid = %s', (id,))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({'status': 'Role deleted'}), 200
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    
+    try:
+        # Delete the specified sales order detail
+        cursor.execute('DELETE FROM roles WHERE roleid = %s', (id,))
+        conn.commit()
+
+        # Fetch the updated list of sales order details
+        cursor.execute('SELECT * FROM roles where maincompanyid = %s', (maincompanyid))
+        roles = cursor.fetchall()
+
+    except psycopg2.Error as e:
+        conn.rollback()
+        return jsonify({'message': str(e)}), 400
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return jsonify({'status': 'Sales Order Detail deleted', 'data': roles}), 200

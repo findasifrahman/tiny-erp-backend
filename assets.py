@@ -71,23 +71,30 @@ def update_asset():
     conn.close()
     return jsonify({'status': 'Asset updated'}), 200
 
-@assets_blueprint.route('/assets/<int:id>', methods=['DELETE'])
+@assets_blueprint.route('/assets', methods=['DELETE'])
 @cross_origin()
 @token_required
-def delete_asset(id):
+def delete_asset():
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
-    error = False
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    
     try:
+        # Delete the specified sales order detail
         cursor.execute('DELETE FROM assets WHERE assetentryid = %s', (id,))
         conn.commit()
+
+        # Fetch the updated list of sales order details
+        cursor.execute('SELECT * FROM assets where maincompanyid = %s', (maincompanyid))
+        roles = cursor.fetchall()
+
     except psycopg2.Error as e:
-        error =True
         conn.rollback()
-        print("error test is --",e)
         return jsonify({'message': str(e)}), 400
+
     finally:
         cursor.close()
         conn.close()
-        if not error:
-            return jsonify({'status': 'Assets deleted'}), 200
+
+    return jsonify({'status': 'Assets deleted', 'data': roles}), 200

@@ -37,7 +37,7 @@ def get_productstock(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     query = '''
-    SELECT p.*, r.categoryname, s.categoryname
+    SELECT p.*, r.categoryname, s.subcategoryname
     FROM productstock p
     JOIN productcategory r ON p.productcategoryid = r.productcategoryid
     JOIN productsubcategory s ON p.productsubcategoryid = s.productsubcategoryid
