@@ -34,7 +34,47 @@ def add_salesorders():
 def get_salesorders(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM salesorder where maincompanyid = %s', (maincompanyid))
+    # updated by asif
+    query = '''
+    SELECT 
+        p.salesorderid,
+        p.maincompanyid,
+        p.customerid,
+        p.customercompany,
+        p.salestype,
+        p.salesagentid,
+        p.salesagent,
+        p.totalamount,
+        p.status,
+        p.orderdate,
+    
+        json_agg(
+            json_build_object(
+                'productcategoryname', r.productcategoryname,
+                'productsubcategoryname', r.productsubcategoryname,
+                'quantity', r.quantity,
+                'unit', r.unit,
+                'price', r.totaldetailprice
+            )
+        ) AS details
+    FROM salesorder p
+    JOIN salesorderdetails r ON p.salesorderid = r.salesorderid
+    WHERE p.maincompanyid = %s
+    GROUP BY 
+        p.salesorderid,
+        p.maincompanyid,
+        p.customerid,
+        p.customercompany,
+        p.salestype,
+        p.salesagentid,
+        p.salesagent,
+        p.totalamount,
+        p.status,
+        p.orderdate
+    '''
+    # ############################
+    cursor.execute(query, (maincompanyid))
+    #cursor.execute('SELECT * FROM salesorder where maincompanyid = %s', (maincompanyid))
     users = cursor.fetchall()
     print("users--",users)
     cursor.close()
