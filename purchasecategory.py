@@ -72,16 +72,21 @@ def update_purchasecategory():
     conn.close()
     return jsonify({'status': 'Purchase Category updated'}), 200
 
-@purchasecategory_blueprint.route('/purchasecategory/<int:id>', methods=['DELETE'])
+@purchasecategory_blueprint.route('/purchasecategory', methods=['DELETE'])
 @cross_origin()
 @token_required
-def delete_purchasecategory( id):
+def delete_purchasecategory():
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     error = False
     try:
         cursor.execute('DELETE FROM purchasecategory WHERE purchasecategoryid = %s', (id,))
         conn.commit()
+        
+        cursor.execute('SELECT * FROM purchasecategory where maincompanyid = %s', (maincompanyid))
+        roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True
         conn.rollback()
@@ -91,4 +96,4 @@ def delete_purchasecategory( id):
         cursor.close()
         conn.close()
         if not error:
-            return jsonify({'status': 'Purchase Category deleted'}), 200
+            return jsonify({'status': 'purchasecategory deleted', 'data': roles}), 200

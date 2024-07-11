@@ -7,7 +7,7 @@ from flask_cors import cross_origin
 from psycopg2.extras import RealDictCursor
 from auth import token_required
 from dbcon import get_db_connection
-
+import psycopg2
 salesorderdetails_blueprint = Blueprint('salesorderdetails', __name__)
 
 @salesorderdetails_blueprint.route('/salesorderdetails', methods=['POST'])
@@ -71,14 +71,28 @@ def update_salesorderdetail():
     conn.close()
     return jsonify({'status': 'Sales Order Detail updated'}), 200
 
-@salesorderdetails_blueprint.route('/salesorderdetails/<int:id>', methods=['DELETE'])
+@salesorderdetails_blueprint.route('/salesorderdetails', methods=['DELETE'])
 @cross_origin()
 @token_required
-def delete_salesorderdetail(id):
+def delete_salesorderdetail():
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('DELETE FROM salesorderdetails WHERE salesorderdetailid = %s', (id,))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({'status': 'Sales Order Detail deleted'}), 200
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    error = False
+    try:
+        cursor.execute('DELETE FROM salesorderdetails WHERE salesorderdetailid = %s', (id,))
+        conn.commit()
+        
+        cursor.execute('SELECT * FROM salesorderdetails where maincompanyid = %s', (maincompanyid))
+        roles = cursor.fetchall()
+    except psycopg2.Error as e:
+        error =True
+        conn.rollback()
+        print("error test is --",e)
+        return jsonify({'message': str(e)}), 400
+    finally:
+        cursor.close()
+        conn.close()
+        if not error:
+            return jsonify({'status': 'salesorderdetails deleted', 'data': roles}), 200

@@ -80,17 +80,22 @@ def update_employee():
     conn.close()
     return jsonify({'status': 'Employee updated'}), 200
 
-@employee_blueprint.route('/employee/<int:id>', methods=['DELETE'])
+@employee_blueprint.route('/employee', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def delete_employee(id):
-    # Implement the logic to delete an employee by id
+def delete_employee():        
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     error = False
     try:
         cursor.execute('DELETE FROM employee WHERE employeeid = %s', (id,))
         conn.commit()
+        
+        # Fetch the updated list of sales order details
+        cursor.execute('SELECT * FROM employee where maincompanyid = %s', (maincompanyid))
+        roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True
         conn.rollback()
@@ -100,4 +105,4 @@ def delete_employee(id):
         cursor.close()
         conn.close()
         if not error:
-            return jsonify({'status': 'Employee deleted'}), 200
+            return jsonify({'status': 'Employee deleted', 'data': roles}), 200

@@ -82,16 +82,28 @@ def update_productstock():
     conn.close()
     return jsonify({'status': 'Product stock updated'}), 200
 
-@productstock_blueprint.route('/productstock/<int:id>', methods=['DELETE'])
+@productstock_blueprint.route('/productstock', methods=['DELETE'])
 @cross_origin()
 @token_required
-def delete_productstock(id):
+def delete_productstock():
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     error = False
     try:
         cursor.execute('DELETE FROM productstock WHERE productstockid = %s', (id,))
         conn.commit()
+        
+        query = '''
+        SELECT p.*, r.categoryname, s.subcategoryname
+        FROM productstock p
+        JOIN productcategory r ON p.productcategoryid = r.productcategoryid
+        JOIN productsubcategory s ON p.productsubcategoryid = s.productsubcategoryid
+        WHERE p.maincompanyid = %s
+        '''
+        cursor.execute(query, (maincompanyid))
+        roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True
         conn.rollback()
@@ -101,4 +113,4 @@ def delete_productstock(id):
         cursor.close()
         conn.close()
         if not error:
-            return jsonify({'status': 'Product stock deleted'}), 200
+            return jsonify({'status': 'productstock deleted', 'data': roles}), 200

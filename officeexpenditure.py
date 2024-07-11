@@ -78,17 +78,27 @@ def update_officeexpenditure():
     conn.close()
     return jsonify({'status': 'Office Expenditure updated'}), 200
 
-@officeexpenditure_blueprint.route('/officeexpenditure/<int:id>', methods=['DELETE'])
+@officeexpenditure_blueprint.route('/officeexpenditure', methods=['DELETE'])
 @cross_origin()
 @token_required
-def delete_officeexpenditure(id):
-    # Implement the logic to delete an employee by id
+def delete_officeexpenditure():        
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     error = False
     try:
         cursor.execute('DELETE FROM officeexpenditure WHERE officeexpenditureid = %s', (id,))
         conn.commit()
+        query = '''
+        SELECT p.*, r.itemname
+        FROM officeexpenditure p
+        JOIN officepurchaseitemlist r ON p.officepurchaseitemlistid = r.officepurchaseitemlistid
+        WHERE p.maincompanyid = %s
+        '''
+        # ############################
+        cursor.execute(query, (maincompanyid))
+        roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True
         conn.rollback()
@@ -98,4 +108,4 @@ def delete_officeexpenditure(id):
         cursor.close()
         conn.close()
         if not error:
-            return jsonify({'status': 'Office Expenditure deleted'}), 200
+            return jsonify({'status': 'officeexpenditure deleted', 'data': roles}), 200

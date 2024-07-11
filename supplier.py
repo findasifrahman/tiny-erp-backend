@@ -71,16 +71,21 @@ def update_supplier():
     conn.close()
     return jsonify({'status': 'Supplier updated'}), 200
 
-@supplier_blueprint.route('/supplier/<int:id>', methods=['DELETE'])
+@supplier_blueprint.route('/supplier', methods=['DELETE'])
 @cross_origin()
 @token_required
-def delete_supplier(id):
+def delete_supplier():
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     error = False
     try:
         cursor.execute('DELETE FROM supplier WHERE supplierid = %s', (id,))
         conn.commit()
+        
+        cursor.execute('SELECT * FROM supplier where maincompanyid = %s', (maincompanyid))
+        roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True
         conn.rollback()
@@ -90,4 +95,4 @@ def delete_supplier(id):
         cursor.close()
         conn.close()
         if not error:
-            return jsonify({'status': 'Supplier deleted'}), 200
+            return jsonify({'status': 'supplier deleted', 'data': roles}), 200

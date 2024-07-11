@@ -72,16 +72,21 @@ def update_paymentsales():
     conn.close()
     return jsonify({'status': 'Payment Sales updated'}), 200
 
-@paymentsales_blueprint.route('/paymentsales/<int:id>', methods=['DELETE'])
+@paymentsales_blueprint.route('/paymentsales', methods=['DELETE'])
 @cross_origin()
 @token_required
-def delete_paymentsales(id):
+def delete_paymentsales():
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     error = False
     try:
         cursor.execute('DELETE FROM paymentsales WHERE paymentid = %s', (id,))
         conn.commit()
+        
+        cursor.execute('SELECT * FROM paymentsales where maincompanyid = %s', (maincompanyid))
+        roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True
         conn.rollback()
@@ -91,4 +96,4 @@ def delete_paymentsales(id):
         cursor.close()
         conn.close()
         if not error:
-            return jsonify({'status': 'Payment Sales deleted'}), 200
+            return jsonify({'status': 'paymentsales deleted', 'data': roles}), 200

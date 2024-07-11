@@ -73,16 +73,21 @@ def update_purchaseorderdetail():
     conn.close()
     return jsonify({'status': 'Purchase Order Detail updated'}), 200
 
-@purchaseorderdetail_blueprint.route('/purchaseorderdetail/<int:id>', methods=['DELETE'])
+@purchaseorderdetail_blueprint.route('/purchaseorderdetail', methods=['DELETE'])
 @cross_origin()
 @token_required
-def delete_purchaseorderdetail(id):
+def delete_purchaseorderdetail():
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     error = False
     try:
         cursor.execute('DELETE FROM purchaseorderdetails WHERE purchasedetailid = %s', (id,))
         conn.commit()
+        
+        cursor.execute('SELECT * FROM purchaseorderdetails where maincompanyid = %s', (maincompanyid))
+        roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True
         conn.rollback()
@@ -92,4 +97,4 @@ def delete_purchaseorderdetail(id):
         cursor.close()
         conn.close()
         if not error:
-            return jsonify({'status': 'Purchase Order Detail deleted'}), 200
+            return jsonify({'status': 'purchaseorderdetails deleted', 'data': roles}), 200

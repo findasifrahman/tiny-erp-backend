@@ -66,10 +66,10 @@ def update_maincompany():
     conn.close()
     return jsonify({'status': 'MainCompany updated'}), 200
 
-@maincompany_blueprint.route('/maincompany/<int:id>', methods=['DELETE'])
+@maincompany_blueprint.route('/maincompany', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def delete_maincompany(id):
+def delete_maincompany():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('DELETE FROM maincompany WHERE maincompanyid = %s', (id,))
@@ -77,3 +77,5 @@ def delete_maincompany(id):
     cursor.close()
     conn.close()
     return jsonify({'status': 'MainCompany deleted'}), 200
+
+

@@ -110,16 +110,59 @@ def update_salesorders():
     conn.close()
     return jsonify({'status': 'Sales Order updated'}), 200
 
-@salesorders_blueprint.route('/salesorders/<int:id>', methods=['DELETE'])
+@salesorders_blueprint.route('/salesorders', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def delete_salesorders(id):
+def delete_salesorders():
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     error = False
     try:
         cursor.execute('DELETE FROM salesorder WHERE salesorderid = %s', (id,))
         conn.commit()
+        
+        query = '''
+        SELECT 
+            p.salesorderid,
+            p.maincompanyid,
+            p.customerid,
+            p.customercompany,
+            p.salestype,
+            p.salesagentid,
+            p.salesagent,
+            p.totalamount,
+            p.status,
+            p.orderdate,
+        
+            json_agg(
+                json_build_object(
+                    'productcategoryname', r.productcategoryname,
+                    'productsubcategoryname', r.productsubcategoryname,
+                    'quantity', r.quantity,
+                    'unit', r.unit,
+                    'price', r.totaldetailprice
+                )
+            ) AS details
+        FROM salesorder p
+        JOIN salesorderdetails r ON p.salesorderid = r.salesorderid
+        WHERE p.maincompanyid = %s
+        GROUP BY 
+            p.salesorderid,
+            p.maincompanyid,
+            p.customerid,
+            p.customercompany,
+            p.salestype,
+            p.salesagentid,
+            p.salesagent,
+            p.totalamount,
+            p.status,
+            p.orderdate
+        '''
+        # ############################
+        cursor.execute(query, (maincompanyid))
+        roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True
         conn.rollback()
@@ -129,7 +172,7 @@ def delete_salesorders(id):
         cursor.close()
         conn.close()
         if not error:
-            return jsonify({'status': 'Sales order deleted'}), 200
+            return jsonify({'status': 'salesorder deleted', 'data': roles}), 200
         
 @salesorders_blueprint.route('/salesorders/getbydate', methods=['GET'])
 @cross_origin()  # Enable CORS for this route

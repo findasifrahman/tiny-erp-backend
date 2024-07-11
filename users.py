@@ -66,16 +66,21 @@ def update_user():
     conn.close()
     return jsonify({'status': 'User updated'}), 200
 
-@user_blueprint.route('/users/<int:id>', methods=['DELETE'])
+@user_blueprint.route('/users', methods=['DELETE'])
 @cross_origin()  # Enable CORS for this route
 @token_required
-def delete_user(id):
+def delete_user():
+    id = request.args.get('id')
+    maincompanyid = request.args.get('maincompanyid')
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     error = False
     try:
         cursor.execute('DELETE FROM users WHERE userid = %s', (id,))
         conn.commit()
+        
+        cursor.execute('SELECT * FROM users where maincompanyid = %s', (maincompanyid))
+        roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True
         conn.rollback()
@@ -85,4 +90,4 @@ def delete_user(id):
         cursor.close()
         conn.close()
         if not error:
-            return jsonify({'status': 'User deleted'}), 200
+            return jsonify({'status': 'users deleted', 'data': roles}), 200
