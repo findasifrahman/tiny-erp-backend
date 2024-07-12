@@ -1,5 +1,6 @@
-#officeexpenditure: officeexpenditureid Serial primary key, maincompanyid int not null unchangeable, officeipurchasetemlistid INT not null, price INT null, unit not 
-#null varchar(15), quantity INT not null, totalamount INT NOT NULL, description text, createdat (TIMESTAMP) 
+#officeexpenditure: officeexpenditureid Serial primary key, maincompanyid int not null unchangeable, officepurchaseitemlistid INT not null, price INT NOT null, 
+#unit not null varchar(15), quantity INT not null, totalamount INT NOT NULL, description text, createdat (TIMESTAMP), date timestamp 
+
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from dbcon import get_db_connection
@@ -30,6 +31,27 @@ def add_officeexpenditure():
 @cross_origin()
 @token_required
 def get_officeexpenditures(maincompanyid):
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    # updated by asif
+    query = '''
+    SELECT p.*, r.itemname
+    FROM officeexpenditure p
+    JOIN officepurchaseitemlist r ON p.officepurchaseitemlistid = r.officepurchaseitemlistid
+    WHERE p.maincompanyid = %s AND p.date >= NOW() - INTERVAL '3 MONTHS'
+    ORDER BY p.date DESC
+    '''
+    # ############################
+    cursor.execute(query, (maincompanyid))
+    officeexpenditures = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(officeexpenditures), 200
+
+@officeexpenditure_blueprint.route('/officeexpenditure/getall/<maincompanyid>', methods=['GET'])
+@cross_origin()
+@token_required
+def get_officeexpenditures_all(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     # updated by asif
@@ -96,7 +118,8 @@ def delete_officeexpenditure():
         SELECT p.*, r.itemname
         FROM officeexpenditure p
         JOIN officepurchaseitemlist r ON p.officepurchaseitemlistid = r.officepurchaseitemlistid
-        WHERE p.maincompanyid = %s
+        WHERE p.maincompanyid = %s AND p.date >= NOW() - INTERVAL '3 MONTHS'
+        ORDER BY p.date DESC
         '''
         # ############################
         cursor.execute(query, (maincompanyid))

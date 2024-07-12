@@ -35,6 +35,22 @@ def add_salarypayroll():
 def get_salarypayrolls(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
+    query = '''
+        SELECT * FROM salarypayroll where maincompanyid = %s AND date >= NOW() - INTERVAL '3 MONTHS'
+        ORDER BY date DESC
+    '''
+    cursor.execute(query, (maincompanyid))
+    salarypayrolls = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(salarypayrolls), 200
+
+@salarypayroll_blueprint.route('/salarypayroll/getall/<maincompanyid>', methods=['GET'])
+@cross_origin()
+@token_required
+def get_salarypayrolls_getall(maincompanyid):
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     cursor.execute('SELECT * FROM salarypayroll where maincompanyid = %s', (maincompanyid))
     salarypayrolls = cursor.fetchall()
     cursor.close()
@@ -86,7 +102,11 @@ def delete_salarypayroll():
         cursor.execute('DELETE FROM salarypayroll WHERE payrollid = %s', (id,))
         conn.commit()
         
-        cursor.execute('SELECT * FROM salarypayroll where maincompanyid = %s', (maincompanyid))
+        query = '''
+            SELECT * FROM salarypayroll where maincompanyid = %s AND date >= NOW() - INTERVAL '3 MONTHS'
+            ORDER BY date DESC
+        '''
+        cursor.execute(query, (maincompanyid))
         roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True

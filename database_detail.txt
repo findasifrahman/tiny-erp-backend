@@ -17,7 +17,7 @@ status default pending not null varchar(50),orderdate timestamp_without_timezone
 productcategory: productcategoryid SERIAL PRIMARY KEY,   maincompanyid int not null unchangeable, categoryname varchar(256) not null,  createdat (TIMESTAMP) 
 
 productsubcategory: productsubcategoryid SERIAL PRIMARY KEY,   mainompanyid int not null unchangeable, productcategoryid int not null,categoryname varchar(256) not null,
-subcategoryname varchar(256) not null,  createdat (TIMESTAMP) 
+subcategoryname varchar(256) not null, price int not null,  createdat (TIMESTAMP) 
 
 salesorderdetails: (salesorderdetailid serial primary key, maincompanyid int not null unchangeable), salesorderid INT NOT NULL, productcategoryid INT NOT NULL, 
 productcategoryname varchar(256) not null, productsubcategoryid INT not null, productsubcategoryname varchar(256) not null,  quantity INT NOT NULL, unit VARCHAR(12) not null, 

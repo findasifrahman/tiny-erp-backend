@@ -19,8 +19,8 @@ def add_productsubcategory():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO productsubcategory (maincompanyid,productcategoryid,categoryname,subcategoryname, createdat) VALUES (%s, %s,%s,%s, CURRENT_TIMESTAMP)',
-        (data['maincompanyid'], data['productcategoryid'], data['categoryname'], data['subcategoryname'])
+        'INSERT INTO productsubcategory (maincompanyid,productcategoryid,categoryname,subcategoryname,price, createdat) VALUES (%s, %s,%s,%s,%s, CURRENT_TIMESTAMP)',
+        (data['maincompanyid'], data['productcategoryid'], data['categoryname'], data['subcategoryname'], data['price'])
     )
     conn.commit()
     cursor.close()
@@ -60,8 +60,8 @@ def update_productsubcategory():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        'UPDATE productsubcategory SET maincompanyid = %s,productcategoryid = %s, categoryname = %s, subcategoryname = %s WHERE productsubcategoryid = %s',
-        (data['maincompanyid'],data['productcategoryid'], data['categoryname'],data['subcategoryname'], data['id'])
+        'UPDATE productsubcategory SET maincompanyid = %s,productcategoryid = %s, categoryname = %s, subcategoryname = %s,price = %s WHERE productsubcategoryid = %s',
+        (data['maincompanyid'],data['productcategoryid'], data['categoryname'],data['subcategoryname'], data['price'], data['id'])
     )
     conn.commit()
     cursor.close()

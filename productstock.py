@@ -41,6 +41,26 @@ def get_productstock(maincompanyid):
     FROM productstock p
     JOIN productcategory r ON p.productcategoryid = r.productcategoryid
     JOIN productsubcategory s ON p.productsubcategoryid = s.productsubcategoryid
+    WHERE p.maincompanyid = %s AND p.entrydate >= NOW() - INTERVAL '3 MONTHS'
+    '''
+    cursor.execute(query, (maincompanyid))
+    #cursor.execute('SELECT * FROM productstock where maincompanyid = %s LIMIT 200;', (maincompanyid))
+    productstocks = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(productstocks), 200
+
+@productstock_blueprint.route('/productstock/getall/<maincompanyid>', methods=['GET'])
+@cross_origin()
+@token_required
+def get_productstock_All(maincompanyid):
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    query = '''
+    SELECT p.*, r.categoryname, s.subcategoryname
+    FROM productstock p
+    JOIN productcategory r ON p.productcategoryid = r.productcategoryid
+    JOIN productsubcategory s ON p.productsubcategoryid = s.productsubcategoryid
     WHERE p.maincompanyid = %s
     '''
     cursor.execute(query, (maincompanyid))
@@ -100,7 +120,7 @@ def delete_productstock():
         FROM productstock p
         JOIN productcategory r ON p.productcategoryid = r.productcategoryid
         JOIN productsubcategory s ON p.productsubcategoryid = s.productsubcategoryid
-        WHERE p.maincompanyid = %s
+        WHERE p.maincompanyid = %s AND p.entrydate >= NOW() - INTERVAL '3 MONTHS'
         '''
         cursor.execute(query, (maincompanyid))
         roles = cursor.fetchall()

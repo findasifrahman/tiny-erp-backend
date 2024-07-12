@@ -33,6 +33,21 @@ def add_paymentsales():
 def get_paymentsales(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
+    query = '''
+    SELECT * FROM paymentsales where maincompanyid = %s AND paymentdate >= NOW() - INTERVAL '3 MONTHS' ORDER BY paymentdate DESC
+    '''
+    cursor.execute(query, (maincompanyid))
+    paymentsales = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(paymentsales), 200
+
+@paymentsales_blueprint.route('/paymentsales/getall/<maincompanyid>', methods=['GET'])
+@cross_origin()
+@token_required
+def get_paymentsales_all(maincompanyid):
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     cursor.execute('SELECT * FROM paymentsales where maincompanyid = %s', (maincompanyid))
     paymentsales = cursor.fetchall()
     cursor.close()
@@ -85,7 +100,10 @@ def delete_paymentsales():
         cursor.execute('DELETE FROM paymentsales WHERE paymentid = %s', (id,))
         conn.commit()
         
-        cursor.execute('SELECT * FROM paymentsales where maincompanyid = %s', (maincompanyid))
+        query = '''
+        SELECT * FROM paymentsales where maincompanyid = %s AND paymentdate >= NOW() - INTERVAL '3 MONTHS' ORDER BY paymentdate DESC
+        '''
+        cursor.execute(query, (maincompanyid))
         roles = cursor.fetchall()
     except psycopg2.Error as e:
         error =True

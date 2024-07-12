@@ -35,6 +35,50 @@ def get_purchaseorders(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     # updated by asif
+      ############################
+    query = '''
+    SELECT 
+        p.purchaseid,
+        p.supplierid,
+        p.totalamount,
+        p.purchasedby,
+        p.date,
+        json_agg(
+            json_build_object(
+                'categoryname', r.categoryname,
+                'subcategoryname', r.subcategoryname,
+                'purchasequantity', r.purchasequantity,
+                'unit', r.unit,
+                'totalamount', r.totalamount
+            )
+        ) AS details
+    FROM purchaseorder p
+    LEFT JOIN purchaseorderdetails r ON p.purchaseid = r.purchaseid
+    WHERE p.maincompanyid = %s AND p.date >= NOW() - INTERVAL '3 MONTHS'
+    GROUP BY 
+        p.purchaseid,
+        p.supplierid,
+        p.totalamount,
+        p.purchasedby,
+        p.date
+    ORDER BY p.date DESC
+    '''
+    # ############################
+    #cursor.execute('SELECT * FROM purchaseorder where maincompanyid = %s', (maincompanyid))
+    cursor.execute(query, (maincompanyid))
+    purchaseorders = cursor.fetchall()
+    print("purchaseorders--",purchaseorders)
+    cursor.close()
+    conn.close()
+    return jsonify(purchaseorders), 200
+
+@purchaseorder_blueprint.route('/purchaseorder/getall/<maincompanyid>', methods=['GET'])
+@cross_origin()
+@token_required
+def get_purchaseorders_getall(maincompanyid):
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    # updated by asif
     query = '''
     SELECT p.*, r.suppliercompany
     FROM purchaseorder p
@@ -95,11 +139,33 @@ def delete_purchaseorder():
         cursor.execute('DELETE FROM purchaseorder WHERE purchaseid = %s', (id,))
         conn.commit()
 
+        ############################
         query = '''
-        SELECT p.*, r.suppliercompany
+        SELECT 
+            p.purchaseid,
+            p.supplierid,
+            p.totalamount,
+            p.purchasedby,
+            p.date,
+            json_agg(
+                json_build_object(
+                    'categoryname', r.categoryname,
+                    'subcategoryname', r.subcategoryname,
+                    'purchasequantity', r.purchasequantity,
+                    'unit', r.unit,
+                    'totalamount', r.totalamount
+                )
+            ) AS details
         FROM purchaseorder p
-        JOIN supplier r ON p.supplierid = r.supplierid
-        WHERE p.maincompanyid = %s
+        LEFT JOIN purchaseorderdetails r ON p.purchaseid = r.purchaseid
+        WHERE p.maincompanyid = %s AND p.date >= NOW() - INTERVAL '3 MONTHS'
+        GROUP BY 
+            p.purchaseid,
+            p.supplierid,
+            p.totalamount,
+            p.purchasedby,
+            p.date
+        ORDER BY p.date DESC
         '''
         # ############################
         #cursor.execute('SELECT * FROM purchaseorder where maincompanyid = %s', (maincompanyid))

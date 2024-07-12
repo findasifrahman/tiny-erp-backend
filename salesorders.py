@@ -59,6 +59,60 @@ def get_salesorders(maincompanyid):
         ) AS details
     FROM salesorder p
     LEFT JOIN salesorderdetails r ON p.salesorderid = r.salesorderid
+    WHERE p.maincompanyid = %s AND p.orderdate >= NOW() - INTERVAL '3 MONTHS'
+    GROUP BY 
+        p.salesorderid,
+        p.maincompanyid,
+        p.customerid,
+        p.customercompany,
+        p.salestype,
+        p.salesagentid,
+        p.salesagent,
+        p.totalamount,
+        p.status,
+        p.orderdate
+     ORDER BY p.orderdate DESC
+    '''
+    # ############################
+    cursor.execute(query, (maincompanyid))
+    #cursor.execute('SELECT * FROM salesorder where maincompanyid = %s', (maincompanyid))
+    users = cursor.fetchall()
+    print("users--",users)
+    cursor.close()
+    conn.close()
+    return jsonify(users), 200
+
+@salesorders_blueprint.route('/salesorders/getall/<maincompanyid>', methods=['GET'])
+@cross_origin()  # Enable CORS for this route
+@token_required
+def get_salesorders_getall(maincompanyid):
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    # updated by asif
+    query = '''
+    SELECT 
+        p.salesorderid,
+        p.maincompanyid,
+        p.customerid,
+        p.customercompany,
+        p.salestype,
+        p.salesagentid,
+        p.salesagent,
+        p.totalamount,
+        p.status,
+        p.orderdate,
+    
+        json_agg(
+            json_build_object(
+                'productcategoryname', r.productcategoryname,
+                'productsubcategoryname', r.productsubcategoryname,
+                'quantity', r.quantity,
+                'unit', r.unit,
+                'price', r.totaldetailprice
+            )
+        ) AS details
+    FROM salesorder p
+    LEFT JOIN salesorderdetails r ON p.salesorderid = r.salesorderid
     WHERE p.maincompanyid = %s
     GROUP BY 
         p.salesorderid,
@@ -147,7 +201,7 @@ def delete_salesorders():
             ) AS details
         FROM salesorder p
         LEFT JOIN salesorderdetails r ON p.salesorderid = r.salesorderid
-        WHERE p.maincompanyid = %s
+        WHERE p.maincompanyid = %s AND p.orderdate >= NOW() - INTERVAL '3 MONTHS'
         GROUP BY 
             p.salesorderid,
             p.maincompanyid,
@@ -159,6 +213,7 @@ def delete_salesorders():
             p.totalamount,
             p.status,
             p.orderdate
+        ORDER BY p.orderdate DESC
         '''
         # ############################
         cursor.execute(query, (maincompanyid))
