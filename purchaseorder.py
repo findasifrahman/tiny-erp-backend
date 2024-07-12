@@ -43,6 +43,7 @@ def get_purchaseorders(maincompanyid):
         p.totalamount,
         p.purchasedby,
         p.date,
+        s.suppliercompany,
         json_agg(
             json_build_object(
                 'categoryname', r.categoryname,
@@ -54,13 +55,15 @@ def get_purchaseorders(maincompanyid):
         ) AS details
     FROM purchaseorder p
     LEFT JOIN purchaseorderdetails r ON p.purchaseid = r.purchaseid
+    JOIN supplier s ON p.supplierid = s.supplierid
     WHERE p.maincompanyid = %s AND p.date >= NOW() - INTERVAL '3 MONTHS'
     GROUP BY 
         p.purchaseid,
         p.supplierid,
         p.totalamount,
         p.purchasedby,
-        p.date
+        p.date,
+        s.suppliercompany
     ORDER BY p.date DESC
     '''
     # ############################
@@ -147,6 +150,7 @@ def delete_purchaseorder():
             p.totalamount,
             p.purchasedby,
             p.date,
+            s.suppliercompany,
             json_agg(
                 json_build_object(
                     'categoryname', r.categoryname,
@@ -158,13 +162,15 @@ def delete_purchaseorder():
             ) AS details
         FROM purchaseorder p
         LEFT JOIN purchaseorderdetails r ON p.purchaseid = r.purchaseid
+        JOIN supplier s ON p.supplierid = s.supplierid
         WHERE p.maincompanyid = %s AND p.date >= NOW() - INTERVAL '3 MONTHS'
         GROUP BY 
             p.purchaseid,
             p.supplierid,
             p.totalamount,
             p.purchasedby,
-            p.date
+            p.date,
+            s.suppliercompany
         ORDER BY p.date DESC
         '''
         # ############################

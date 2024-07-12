@@ -66,8 +66,6 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
-    print(username)
-    print(password)
 
     query = f'''
     SELECT u.*, m.companyname
@@ -89,6 +87,39 @@ def login():
         print(user)
         return jsonify({'token': token, "maincompanyid": user['maincompanyid'], "maincompanyname": user['companyname'] }), 200
     return jsonify({'message': 'Invalid credentials'}), 401
+
+@app.route('/change-password', methods=['POST'])
+def changePassword():
+    data = request.json
+    print(data)
+    username = data.get('username')
+    password = data.get('newPassword')
+    oldPassword = data.get('oldPassword')
+    print(data)
+
+    print(username)
+    print(password)
+
+    query = f'''
+    SELECT username, password
+    FROM users 
+    WHERE username = %s AND password = %s
+    '''
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    cursor.execute(query,(username, oldPassword))
+    user = cursor.fetchone()
+    print("login user--",user)
+    if user:
+        cursor.execute('UPDATE users SET password = %s WHERE username = %s', (password, username))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({'message': 'Password changed successfully'}), 200
+    cursor.close()
+    conn.close()
+    return jsonify({'message': 'Invalid credentials'}), 401
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
