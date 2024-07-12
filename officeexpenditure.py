@@ -46,6 +46,8 @@ def get_officeexpenditures(maincompanyid):
     conn.close()
     return jsonify(officeexpenditures), 200
 
+
+
 @officeexpenditure_blueprint.route('/officeexpenditure/getbyid', methods=['GET'])
 @cross_origin()
 @token_required

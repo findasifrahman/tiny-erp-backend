@@ -58,7 +58,7 @@ def get_salesorders(maincompanyid):
             )
         ) AS details
     FROM salesorder p
-    JOIN salesorderdetails r ON p.salesorderid = r.salesorderid
+    LEFT JOIN salesorderdetails r ON p.salesorderid = r.salesorderid
     WHERE p.maincompanyid = %s
     GROUP BY 
         p.salesorderid,
@@ -146,7 +146,7 @@ def delete_salesorders():
                 )
             ) AS details
         FROM salesorder p
-        JOIN salesorderdetails r ON p.salesorderid = r.salesorderid
+        LEFT JOIN salesorderdetails r ON p.salesorderid = r.salesorderid
         WHERE p.maincompanyid = %s
         GROUP BY 
             p.salesorderid,

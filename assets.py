@@ -33,11 +33,12 @@ def add_asset():
 def get_assets(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM assets WHERE maincompanyid = %s', (maincompanyid))
+    cursor.execute('SELECT * FROM assets WHERE maincompanyid  = %s', (maincompanyid))
     assets = cursor.fetchall()
     cursor.close()
     conn.close()
     return jsonify(assets), 200
+
 
 @assets_blueprint.route('/assets/getbyid', methods=['GET'])
 @cross_origin()
