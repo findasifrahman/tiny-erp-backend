@@ -12,4 +12,5 @@ def get_db_connection():
         user=os.getenv('DB_USER'),
         password=os.getenv('DB_PASS')
     )
-    return conn
+    db_connection_string = os.environ.get('DB_CONNECTION_STRING')
+    return db_connection_string#conn
