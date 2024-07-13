@@ -8,6 +8,7 @@ from customer import customer_blueprint
 from auth import generate_token, token_required
 from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
+import azure.functions as func
 
 from employee import employee_blueprint
 from salesorders import salesorders_blueprint
@@ -120,6 +121,9 @@ def changePassword():
     conn.close()
     return jsonify({'message': 'Invalid credentials'}), 401
 
+
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    return func.WsgiMiddleware(app.wsgi_app).handle(req)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

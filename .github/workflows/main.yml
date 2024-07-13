@@ -26,6 +26,6 @@ jobs:
       - name: Upload to Azure Functions
         uses: azure/functions-action@v1
         with:
-          app-name: tinyerpfunction  # Replace with your Function App name
+          app-name: 'tinyerpfunction' # Replace with your Function App name
           package: '.'
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
