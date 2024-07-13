@@ -7,7 +7,7 @@ def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
     return func.WsgiMiddleware(flask_app).handle(req, context)
 
-'''
+
 @app.route(route="function_app", auth_level=func.AuthLevel.Anonymous)
 def function_app(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
@@ -29,4 +29,3 @@ def function_app(req: func.HttpRequest) -> func.HttpResponse:
              status_code=200
         )
 
-'''
