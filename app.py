@@ -124,7 +124,7 @@ def changePassword():
 #######test#
 @app.route('/user/<maincompanyid>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
-def get_users(maincompanyid):
+def get_al_users(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     cursor.execute('SELECT * FROM users where maincompanyid = %s', (maincompanyid))
