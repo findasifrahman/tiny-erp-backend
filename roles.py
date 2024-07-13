@@ -4,7 +4,9 @@ from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
-roles_blueprint = Blueprint('roles', __name__)
+
+import azure.functions as func
+roles_blueprint = func.Blueprint('roles', __name__)
 
 @roles_blueprint.route('/roles', methods=['POST'])
 @cross_origin()  # Enable CORS for this route

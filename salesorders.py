@@ -9,7 +9,9 @@ from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
 from datetime import datetime
-salesorders_blueprint = Blueprint('salesorders', __name__)
+
+import azure.functions as func
+salesorders_blueprint = func.Blueprint('salesorders', __name__)
 
 
 @salesorders_blueprint.route('/salesorders', methods=['POST'])

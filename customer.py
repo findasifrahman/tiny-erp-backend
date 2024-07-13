@@ -1,10 +1,12 @@
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
 from flask_cors import cross_origin
 from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
-customer_blueprint = Blueprint('customer', __name__)
+
+import azure.functions as func
+customer_blueprint = func.Blueprint('customer', __name__)
 
 
 @customer_blueprint.route('/customer', methods=['POST'])

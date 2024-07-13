@@ -8,7 +8,9 @@ from auth import token_required
 from dbcon import get_db_connection
 import psycopg2
 from datetime import datetime
-purchaseorder_blueprint = Blueprint('purchaseorder', __name__)
+
+import azure.functions as func
+purchaseorder_blueprint = func.Blueprint('purchaseorder', __name__)
 
 
 @purchaseorder_blueprint.route('/purchaseorder', methods=['POST'])

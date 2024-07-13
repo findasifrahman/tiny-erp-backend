@@ -7,7 +7,9 @@ from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
-paymentsales_blueprint = Blueprint('paymentsales', __name__)
+
+import azure.functions as func
+paymentsales_blueprint = func.Blueprint('paymentsales', __name__)
 
 
 @paymentsales_blueprint.route('/paymentsales', methods=['POST'])

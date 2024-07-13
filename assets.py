@@ -1,13 +1,14 @@
 #assets: assetentryid Serial Primary key, maincompanyid int not null unchangeable, assetname varchar(256) not null, description not null TEXT, assetvalue not null INT,
 #purchasedate timestamp not null, image bytea, createdat (TIMESTAMP)
 
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
 from flask_cors import cross_origin
 from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
-assets_blueprint = Blueprint('assets', __name__)
+import azure.functions as func
+assets_blueprint = func.Blueprint('assets', __name__)
 
 
 @assets_blueprint.route('/assets', methods=['POST'])

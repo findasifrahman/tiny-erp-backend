@@ -8,7 +8,9 @@ from psycopg2.extras import RealDictCursor
 from auth import token_required
 from dbcon import get_db_connection
 import psycopg2
-salesorderdetails_blueprint = Blueprint('salesorderdetails', __name__)
+
+import azure.functions as func
+salesorderdetails_blueprint = func.Blueprint('salesorderdetails', __name__)
 
 @salesorderdetails_blueprint.route('/salesorderdetails', methods=['POST'])
 @cross_origin()

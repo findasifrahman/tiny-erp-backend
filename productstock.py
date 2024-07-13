@@ -10,7 +10,9 @@ from dbcon import get_db_connection
 from psycopg2.extras import RealDictCursor
 from auth import token_required
 import psycopg2
-productstock_blueprint = Blueprint('productstock', __name__)
+
+import azure.functions as func
+productstock_blueprint = func.Blueprint('productstock', __name__)
 
 
 @productstock_blueprint.route('/productstock', methods=['POST'])

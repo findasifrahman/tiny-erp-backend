@@ -7,7 +7,9 @@ from dbcon import get_db_connection
 from psycopg2.extras import RealDictCursor
 from auth import token_required
 import psycopg2
-purchasesubcategory_blueprint = Blueprint('purchasesubcategory', __name__)
+
+import azure.functions as func
+purchasesubcategory_blueprint = func.Blueprint('purchasesubcategory', __name__)
 
 
 @purchasesubcategory_blueprint.route('/purchasesubcategory', methods=['POST'])

@@ -8,7 +8,8 @@ from psycopg2.extras import RealDictCursor
 import psycopg2
 from auth import token_required
 
-officeexpenditure_blueprint = Blueprint('officeexpenditure', __name__)
+import azure.functions as func
+officeexpenditure_blueprint = func.Blueprint('officeexpenditure', __name__)
 
 @officeexpenditure_blueprint.route('/officeexpenditure', methods=['POST'])
 @cross_origin()

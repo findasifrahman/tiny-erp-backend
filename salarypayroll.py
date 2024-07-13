@@ -9,7 +9,9 @@ from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
-salarypayroll_blueprint = Blueprint('salarypayroll', __name__)
+
+import azure.functions as func
+salarypayroll_blueprint = func.Blueprint('salarypayroll', __name__)
 
 
 @salarypayroll_blueprint.route('/salarypayroll', methods=['POST'])

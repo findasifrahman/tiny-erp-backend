@@ -7,7 +7,9 @@ from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
-officepurchaseitemlist_blueprint = Blueprint('officepurchaseitemlist', __name__)
+
+import azure.functions as func
+officepurchaseitemlist_blueprint = func.Blueprint('officepurchaseitemlist', __name__)
 
 
 @officepurchaseitemlist_blueprint.route('/officepurchaseitemlist', methods=['POST'])

@@ -4,7 +4,8 @@ from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 
-maincompany_blueprint = Blueprint('maincompany', __name__)
+import azure.functions as func
+maincompany_blueprint = func.Blueprint('maincompany', __name__)
 
 
 

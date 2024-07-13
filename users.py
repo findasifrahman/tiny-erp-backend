@@ -5,7 +5,8 @@ from auth import token_required
 import psycopg2
 from dbcon import get_db_connection
 
-user_blueprint = Blueprint('users', __name__)
+import azure.functions as func
+user_blueprint = func.Blueprint('users', __name__)
 
 
 

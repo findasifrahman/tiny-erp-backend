@@ -8,7 +8,8 @@ from psycopg2.extras import RealDictCursor
 import psycopg2
 from auth import token_required
 
-purchasecategory_blueprint = Blueprint('purchasecategory', __name__)
+import azure.functions as func
+purchasecategory_blueprint = func.Blueprint('purchasecategory', __name__)
 
 
 @purchasecategory_blueprint.route('/purchasecategory', methods=['POST'])

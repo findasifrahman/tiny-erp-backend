@@ -8,7 +8,9 @@ from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
-productsubcategory_blueprint = Blueprint('productsubcategory', __name__)
+
+import azure.functions as func
+productsubcategory_blueprint = func.Blueprint('productsubcategory', __name__)
 
 
 @productsubcategory_blueprint.route('/productsubcategory', methods=['POST'])

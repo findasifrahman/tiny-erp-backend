@@ -5,13 +5,15 @@
     nidnumber varchar (20), salary int not null, grade varchar(10), roleid int not null, state varchar(20),description text, image bytea, createdat timestamp
  """    
 
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
 from flask_cors import cross_origin
 from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
-employee_blueprint = Blueprint('employee', __name__)
+
+import azure.functions as func
+employee_blueprint = func.Blueprint('employee', __name__)
 
 @employee_blueprint.route('/employee', methods=['POST'])
 @cross_origin()  # Enable CORS for this route

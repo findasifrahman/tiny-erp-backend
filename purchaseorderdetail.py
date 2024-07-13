@@ -9,7 +9,9 @@ from dbcon import get_db_connection
 from psycopg2.extras import RealDictCursor
 from auth import token_required
 import psycopg2
-purchaseorderdetail_blueprint = Blueprint('purchaseorderdetail', __name__)
+
+import azure.functions as func
+purchaseorderdetail_blueprint = func.Blueprint('purchaseorderdetail', __name__)
 
 
 @purchaseorderdetail_blueprint.route('/purchaseorderdetail', methods=['POST'])
