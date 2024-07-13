@@ -25,7 +25,6 @@ def add_customer():
 
 @customer_blueprint.route('/customer/<maincompanyid>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
-@token_required
 def get_customers(maincompanyid):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
