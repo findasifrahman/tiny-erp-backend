@@ -35,4 +35,4 @@ jobs:
 
     - name: Deploy to Azure Functions
       run: |
-        func azure functionapp publish ${{ secrets.AZURE_FUNCTIONAPP_NAME }} --publish-local-settings
+        func azure functionapp publish tinyerpfunction --publish-local-settings
