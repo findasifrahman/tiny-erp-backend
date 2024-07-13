@@ -26,7 +26,7 @@ from officepurchaseitemlist import officepurchaseitemlist_blueprint
 from officeexpenditure import officeexpenditure_blueprint
 from assets import assets_blueprint
 from productstock import productstock_blueprint
-
+from flask_cors import cross_origin
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -121,9 +121,21 @@ def changePassword():
     conn.close()
     return jsonify({'message': 'Invalid credentials'}), 401
 
+#######test#
+@app.route('/user/<maincompanyid>', methods=['GET'])
+@cross_origin()  # Enable CORS for this route
+def get_users(maincompanyid):
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    cursor.execute('SELECT * FROM users where maincompanyid = %s', (maincompanyid))
+    users = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(users), 200
+#############
 
-def main(req: func.HttpRequest) -> func.HttpResponse:
-    return func.WsgiMiddleware(app.wsgi_app).handle(req)
+#def main(req: func.HttpRequest) -> func.HttpResponse:
+#    return func.WsgiMiddleware(app.wsgi_app).handle(req)
 
 if __name__ == '__main__':
     #app.run(host='0.0.0.0', port=5000)
