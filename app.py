@@ -125,13 +125,14 @@ def changePassword():
 @app.route('/user/<maincompanyid>', methods=['GET'])
 @cross_origin()  # Enable CORS for this route
 def get_al_users(maincompanyid):
-    conn = get_db_connection()
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM users where maincompanyid = %s', (maincompanyid))
-    users = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return jsonify(users), 200
+    #conn = get_db_connection()
+    ##cursor = conn.cursor(cursor_factory=RealDictCursor)
+    #cursor.execute('SELECT * FROM users where maincompanyid = %s', (maincompanyid))
+    #users = cursor.fetchall()
+    #cursor.close()
+    #conn.close()
+    #return jsonify(users), 200
+    return jsonify({'message': 'Password changed successfully'}), 200
 #############
 
 #def main(req: func.HttpRequest) -> func.HttpResponse:
