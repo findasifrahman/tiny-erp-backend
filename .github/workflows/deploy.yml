@@ -1,0 +1,37 @@
+name: Deploy Flask App to Azure Functions
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Install Azure Functions Core Tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y nodejs
+        sudo npm install -g azure-functions-core-tools@3 --unsafe-perm true
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Deploy to Azure Functions
+      env:
+        AZURE_FUNCTIONAPP_NAME: 'tinyerpfunction'  # set this to your function app name
+        AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+      run: |
+        func azure functionapp publish $AZURE_FUNCTIONAPP_NAME --publish-local-settings
