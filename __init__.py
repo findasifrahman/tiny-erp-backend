@@ -2,6 +2,8 @@ import azure.functions as func
 import logging
 from app import app as flask_app
 
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+
 def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
     return func.WsgiMiddleware(flask_app).handle(req, context)
