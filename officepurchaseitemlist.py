@@ -9,6 +9,8 @@ from auth import token_required
 import psycopg2
 
 import azure.functions as func
+from mapp import create_app
+app = create_app()#Flask(__name__)
 officepurchaseitemlist_blueprint = func.Blueprint('officepurchaseitemlist', __name__)
 
 

@@ -9,6 +9,8 @@ import psycopg2
 from auth import token_required
 
 import azure.functions as func
+from mapp import create_app
+app = create_app()#Flask(__name__)
 officeexpenditure_blueprint = func.Blueprint('officeexpenditure', __name__)
 
 @officeexpenditure_blueprint.route('/officeexpenditure', methods=['POST'])

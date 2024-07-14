@@ -6,6 +6,6 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true"
   },
   "Host": {
-    "CORS": ["http://localhost:4200"]
+    "CORS": "*"
   }
 }

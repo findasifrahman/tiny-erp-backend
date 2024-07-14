@@ -13,6 +13,8 @@ from auth import token_required
 import psycopg2
 
 import azure.functions as func
+from mapp import create_app
+app = create_app()#Flask(__name__)
 employee_blueprint = func.Blueprint('employee', __name__)
 
 @employee_blueprint.route('/employee', methods=['POST'])

@@ -10,6 +10,8 @@ import psycopg2
 from datetime import datetime
 
 import azure.functions as func
+from mapp import create_app
+app = create_app()#Flask(__name__)
 purchaseorder_blueprint = func.Blueprint('purchaseorder', __name__)
 
 

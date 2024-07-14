@@ -8,6 +8,8 @@ from dbcon import get_db_connection
 from auth import token_required
 import psycopg2
 import azure.functions as func
+from mapp import create_app
+app = create_app()#Flask(__name__)
 assets_blueprint = func.Blueprint('assets', __name__)
 
 

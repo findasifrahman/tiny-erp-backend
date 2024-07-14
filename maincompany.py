@@ -5,6 +5,8 @@ from dbcon import get_db_connection
 from auth import token_required
 
 import azure.functions as func
+from mapp import create_app
+app = create_app()#Flask(__name__)
 maincompany_blueprint = func.Blueprint('maincompany', __name__)
 
 

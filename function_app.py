@@ -1,22 +1,19 @@
-import azure.functions as func
 import logging
-from app import app as flask_app
-from azure.functions import WsgiMiddleware
-
-#app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
-
-
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-
+from flask_cors import CORS, cross_origin
+import azure.functions as func
 from auth import generate_token, token_required
 from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
-import azure.functions as func
+from dbcon import get_db_connection
+from mapp import create_app
 
-# from users import user_blueprint
+
+from users import user_blueprint
+from roles import roles_blueprint
+from supplier import supplier_blueprint
+from salesorders import salesorders_blueprint
 # from maincompany import maincompany_blueprint
-# from roles import roles_blueprint
 # from customer import customer_blueprint
 # from employee import employee_blueprint
 # from salesorders import salesorders_blueprint
@@ -34,17 +31,6 @@ import azure.functions as func
 # from officeexpenditure import officeexpenditure_blueprint
 # from assets import assets_blueprint
 # from productstock import productstock_blueprint
-
-from flask_cors import cross_origin
-
-#app = Flask(__name__)
-#app = func.FunctionApp()
-#flask_app = Flask(__name__) 
-app = Flask(__name__)
-
-flask_app = func.FunctionApp()
-#CORS(app)  # Enable CORS for all routes
-CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}})
 
 # Register blueprints
 # app.register_blueprint(user_blueprint)
@@ -70,23 +56,41 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}})
 # app.register_blueprint(productstock_blueprint)
 
 
-# Dummy user data for authentication
-users = {
-    "user1": "password1",
-    "user2": "password2"
-}
 
-@flask_app.route('login', methods=['POST'])
-@cross_origin(origins="http://localhost:4200")
-def login(req: func.HttpRequest,):
+app = create_app()#Flask(__name__)
+
+CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}})
+
+function_app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+
+
+##
+function_app.register_functions(user_blueprint)
+function_app.register_functions(roles_blueprint)
+function_app.register_functions(supplier_blueprint)
+function_app.register_functions(salesorders_blueprint)
+##
+
+@function_app.route(route="login", methods=["POST", "OPTIONS"])
+async def login(req: func.HttpRequest):
+    if req.method == "OPTIONS":
+        return func.HttpResponse(
+            headers={
+                "Access-Control-Allow-Origin": "http://localhost:4200",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization"
+            },
+            status_code=204
+        )
+
     with app.app_context():
-        data = request.json
+        data = req.get_json()
         username = data.get('username')
         password = data.get('password')
 
-        print("login data-",data)
+        logging.info(f'Login data: {data}')
 
-        query = f'''
+        query = '''
         SELECT u.*, m.companyname
         FROM users u
         JOIN maincompany m ON u.maincompanyid = m.maincompanyid
@@ -94,97 +98,63 @@ def login(req: func.HttpRequest,):
         '''
         conn = get_db_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute(query,(username, password))#('SELECT * FROM users WHERE username = %s AND password = %s', (username, password))
+        cursor.execute(query, (username, password))
         user = cursor.fetchone()
-        print("login user--",user)
         cursor.close()
         conn.close()
 
-        # if user:
-        #     token = generate_token(user['username'], user['roleid'])
-        #     print("generated token--",token)
-        #     print(user)
-        #     return jsonify({'token': token, "maincompanyid": user['maincompanyid'], "maincompanyname": user['companyname'] }), 200
-        # return jsonify({'message': 'Invalid credentials'}), 401
         if user:
             token = generate_token(user['username'], user['roleid'])
             logging.info(f'Generated token: {token}')
             return func.HttpResponse(
                 jsonify({'token': token, "maincompanyid": user['maincompanyid'], "maincompanyname": user['companyname']}).get_data(as_text=True),
                 mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "http://localhost:4200"},
                 status_code=200
             )
         return func.HttpResponse(
             jsonify({'message': 'Invalid credentials'}).get_data(as_text=True),
             mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "http://localhost:4200"},
             status_code=401
         )
 
-@flask_app.route('change-password', methods=['POST'])
-#@cross_origin()  # Enable CORS for this route
-def changePassword(req: func.HttpRequest):
-    data = request.json
-    print(data)
-    username = data.get('username')
-    password = data.get('newPassword')
-    oldPassword = data.get('oldPassword')
-    print(data)
-
-    print(username)
-    print(password)
-
-    query = f'''
-    SELECT username, password
-    FROM users 
-    WHERE username = %s AND password = %s
-    '''
-    conn = get_db_connection()
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute(query,(username, oldPassword))
-    user = cursor.fetchone()
-    print("login user--",user)
-    if user:
-        cursor.execute('UPDATE users SET password = %s WHERE username = %s', (password, username))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return jsonify({'message': 'Password changed successfully'}), 200
-    cursor.close()
-    conn.close()
-    return jsonify({'message': 'Invalid credentials'}), 401
-
-#######test#
-@flask_app.route('user/{maincompanyid}', methods=['GET'])
-#@cross_origin()  # Enable CORS for this route
-async def get_al_users(req: func.HttpRequest):
+@function_app.route(route="change-password", methods=["POST"])
+@cross_origin(origins="http://localhost:4200")
+async def change_password(req: func.HttpRequest):
     with app.app_context():
-        maincompanyid = req.route_params.get('maincompanyid')
-        print("maincompanyid--",maincompanyid)
+        data = req.get_json()
+        username = data.get('username')
+        password = data.get('newPassword')
+        old_password = data.get('oldPassword')
+
+        query = '''
+        SELECT username, password
+        FROM users 
+        WHERE username = %s AND password = %s
+        '''
         conn = get_db_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute('SELECT * FROM users where maincompanyid = %s', (maincompanyid,))
-        users = cursor.fetchall()
+        cursor.execute(query, (username, old_password))
+        user = cursor.fetchone()
+        
+        if user:
+            cursor.execute('UPDATE users SET password = %s WHERE username = %s', (password, username))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return func.HttpResponse(
+                jsonify({'message': 'Password changed successfully'}).get_data(as_text=True),
+                mimetype="application/json",
+                status_code=200
+            )
+
         cursor.close()
         conn.close()
-
-        response_data = jsonify(users).get_data(as_text=True)
-        return func.HttpResponse(response_data, mimetype="application/json", status_code=200)
-        #return jsonify(users), 200
-
-
-#############
-
-# Create an Azure Function which serves the above routes in our WSGI runtime (Gunicorn)
-#app = func.WsgiFunctionApp(app=flask_app.wsgi_app, http_auth_level=func.AuthLevel.ANONYMOUS)
-# Azure Functions entry point
-# def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
-#     logging.info('Python HTTP trigger function processed a request.')
-#     return WsgiMiddleware(app).handle(req, context)
-
-#def main(req: func.HttpRequest) -> func.HttpResponse:
-#    return func.WsgiMiddleware(app.wsgi_app).handle(req)
-
-
-
+        return func.HttpResponse(
+            jsonify({'message': 'Invalid credentials'}).get_data(as_text=True),
+            mimetype="application/json",
+            status_code=401
+        )
 
 

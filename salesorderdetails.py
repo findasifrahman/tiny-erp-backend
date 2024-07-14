@@ -10,6 +10,8 @@ from dbcon import get_db_connection
 import psycopg2
 
 import azure.functions as func
+from mapp import create_app
+app = create_app()#Flask(__name__)
 salesorderdetails_blueprint = func.Blueprint('salesorderdetails', __name__)
 
 @salesorderdetails_blueprint.route('/salesorderdetails', methods=['POST'])

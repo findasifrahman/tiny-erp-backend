@@ -9,6 +9,8 @@ import psycopg2
 from auth import token_required
 
 import azure.functions as func
+from mapp import create_app
+app = create_app()#Flask(__name__)
 purchasecategory_blueprint = func.Blueprint('purchasecategory', __name__)
 
 
