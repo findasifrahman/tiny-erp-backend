@@ -2,7 +2,7 @@ import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 import azure.functions as func
-from auth import generate_token, token_required
+from auth import generate_token, token_required, decode_token
 from psycopg2.extras import RealDictCursor
 from dbcon import get_db_connection
 from dbcon import get_db_connection
@@ -11,72 +11,110 @@ from mapp import create_app
 
 from users import user_blueprint
 from roles import roles_blueprint
-from supplier import supplier_blueprint
+
+
+from maincompany import maincompany_blueprint
+from customer import customer_blueprint
+from employee import employee_blueprint
 from salesorders import salesorders_blueprint
-# from maincompany import maincompany_blueprint
-# from customer import customer_blueprint
-# from employee import employee_blueprint
-# from salesorders import salesorders_blueprint
-# from productcategory import productcategory_blueprint
-# from productsubcategory import productsubcategory_blueprint
-# from salesorderdetails import salesorderdetails_blueprint
-# from paymentsales import paymentsales_blueprint
-# from purchasecategory import purchasecategory_blueprint
-# from purchasesubcategory import purchasesubcategory_blueprint
-# from supplier import supplier_blueprint
-# from purchaseorder import purchaseorder_blueprint
-# from purchaseorderdetail import purchaseorderdetail_blueprint
-# from salarypayroll import salarypayroll_blueprint
-# from officepurchaseitemlist import officepurchaseitemlist_blueprint
-# from officeexpenditure import officeexpenditure_blueprint
-# from assets import assets_blueprint
-# from productstock import productstock_blueprint
+from productcategory import productcategory_blueprint
+from productsubcategory import productsubcategory_blueprint
+from salesorderdetails import salesorderdetails_blueprint
+from paymentsales import paymentsales_blueprint
+from purchasecategory import purchasecategory_blueprint
+from purchasesubcategory import purchasesubcategory_blueprint
+from supplier import supplier_blueprint
+from purchaseorder import purchaseorder_blueprint
+from purchaseorderdetail import purchaseorderdetail_blueprint
+from salarypayroll import salarypayroll_blueprint
+from officepurchaseitemlist import officepurchaseitemlist_blueprint
+from officeexpenditure import officeexpenditure_blueprint
+from assets import assets_blueprint
+from productstock import productstock_blueprint
 
-# Register blueprints
-# app.register_blueprint(user_blueprint)
-# app.register_blueprint(maincompany_blueprint)
-# app.register_blueprint(roles_blueprint)
-# app.register_blueprint(customer_blueprint )
-
-# app.register_blueprint(employee_blueprint)
-# app.register_blueprint(salesorders_blueprint)
-# app.register_blueprint(salesorderdetails_blueprint)
-# app.register_blueprint(productcategory_blueprint)
-# app.register_blueprint(productsubcategory_blueprint)
-# app.register_blueprint(paymentsales_blueprint)
-# app.register_blueprint(purchasecategory_blueprint)
-# app.register_blueprint(purchasesubcategory_blueprint)
-# app.register_blueprint(supplier_blueprint)
-# app.register_blueprint(purchaseorder_blueprint)
-# app.register_blueprint(purchaseorderdetail_blueprint)
-# app.register_blueprint(salarypayroll_blueprint)
-# app.register_blueprint(officepurchaseitemlist_blueprint)
-# app.register_blueprint(officeexpenditure_blueprint)
-# app.register_blueprint(assets_blueprint)
-# app.register_blueprint(productstock_blueprint)
 
 
 
 app = create_app()#Flask(__name__)
 
-CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}})
+CORS(app)#, resources={r"/*": {"origins": "https://proud-ocean-0ed2e3100.5.azurestaticapps.net"}})
 
 function_app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 
 ##
 function_app.register_functions(user_blueprint)
+#app.register_blueprint(user_blueprint)
+
 function_app.register_functions(roles_blueprint)
 function_app.register_functions(supplier_blueprint)
 function_app.register_functions(salesorders_blueprint)
-##
+function_app.register_functions(salesorderdetails_blueprint)
+function_app.register_functions(purchasecategory_blueprint)
+function_app.register_functions(purchasesubcategory_blueprint)
+function_app.register_functions(purchaseorder_blueprint)
+function_app.register_functions(purchaseorderdetail_blueprint)
+function_app.register_functions(productcategory_blueprint)
+function_app.register_functions(productsubcategory_blueprint)
+function_app.register_functions(customer_blueprint)
+function_app.register_functions(employee_blueprint)
+function_app.register_functions(maincompany_blueprint)
+function_app.register_functions(salarypayroll_blueprint)
+function_app.register_functions(paymentsales_blueprint)
+function_app.register_functions(officepurchaseitemlist_blueprint)
+function_app.register_functions(officeexpenditure_blueprint)
+function_app.register_functions(assets_blueprint)
+function_app.register_functions(productstock_blueprint)
 
+##
+'''
+def dispatch_request(req: func.HttpRequest, route_prefix: str):
+    with app.app_context():
+        token = req.headers.get('Authorization')
+        if token:
+            # If token is present, validate it
+            is_valid = decode_token(token)  # Implement validate_token according to your logic
+            if not is_valid['user']:
+                return func.HttpResponse(
+                    "Unauthorized",
+                    status_code=401,
+                    headers={"Access-Control-Allow-Origin": "*"}
+                )
+
+        # Create the URL with query parameters
+        path = f"/{route_prefix}/{req.route_params.get('*route')}"
+        query_string = req.url.split('?')[1] if '?' in req.url else ''
+        full_path = f"{path}?{query_string}" if query_string else path
+
+        with app.test_request_context(full_path, method=req.method, data=req.get_body(), headers=dict(req.headers)):
+            response = app.full_dispatch_request()
+            return func.HttpResponse(
+                response.get_data(as_text=True),
+                status_code=response.status_code,
+                headers={
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS, GET, DELETE",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+                },
+                mimetype="application/json"
+            )
+
+
+
+@function_app.route(route="users/{*route}", methods=["GET", "POST", "OPTIONS", "DELETE"])
+async def users_dispatcher(req: func.HttpRequest):
+    logging.info(f'users_dispatcher is --------------------------- {req.route_params.get("maincompanyid")} ')
+    logging.info(f'users_dispatcher rote is --------------------------- {req.route_params} ')
+
+    return dispatch_request(req, "users")
+'''
+##
 @function_app.route(route="login", methods=["POST", "OPTIONS"])
 async def login(req: func.HttpRequest):
     if req.method == "OPTIONS":
         return func.HttpResponse(
             headers={
-                "Access-Control-Allow-Origin": "http://localhost:4200",
+                "Access-Control-Allow-Origin": "https://proud-ocean-0ed2e3100.5.azurestaticapps.net",
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type, Authorization"
             },

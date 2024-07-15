@@ -17,96 +17,108 @@ from mapp import create_app
 app = create_app()#Flask(__name__)
 employee_blueprint = func.Blueprint('employee', __name__)
 
-@employee_blueprint.route('/employee', methods=['POST'])
-@cross_origin()  # Enable CORS for this route
-@token_required
-def add_employee():
+@employee_blueprint.route('employee', methods=['POST'])
+#@cross_origin()  # Enable CORS for this route
+#@token_required
+def add_employee(req: func.HttpRequest):
     # Implement the logic to add an employee
-    data = request.json
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
+    data = req.get_json()
+    with app.app_context():
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                'INSERT INTO employee (maincompanyid, joiningdate, employeename, age, contactno, address, nidnumber, salary, grade, roleid, state, description, image, createdat) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)',
+                (data['maincompanyid'], data['joiningdate'], data['employeename'], data['age'], data['contactno'], data['address'], data['nidnumber'], data['salary'], data['grade'], data['roleid'], data['state'], data['description'], data['image'])
+            )
+            conn.commit()
+            return func.HttpResponse(jsonify({'status': 'Employee added'}).get_data(as_text=True), mimetype="application/json", status_code=201)
+        
+        except Exception as e:
+            conn.rollback()
+            return func.HttpResponse(jsonify({'message': str(e)}).get_data(as_text=True), mimetype="application/json", status_code=500)
+
+        finally:
+            cursor.close()
+            conn.close()
+    
+
+@employee_blueprint.route('employee/{maincompanyid}', methods=['GET'])
+#@cross_origin()  # Enable CORS for this route
+#@token_required
+def get_employees(req: func.HttpRequest):
+    # Implement the logic to get employees by maincompanyid
+    maincompanyid = req.route_params.get('maincompanyid')
+    with app.app_context():
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute('SELECT * FROM employee where maincompanyid = %s', (maincompanyid))
+        users = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        response_data = jsonify(users).get_data(as_text=True)
+        return func.HttpResponse(response_data, mimetype="application/json", status_code=200)
+
+
+@employee_blueprint.route('employee-getbyid', methods=['GET'])
+#@cross_origin()  # Enable CORS for this route
+#@token_required
+def get_employee_by_id(req: func.HttpRequest):
+    # Implement the logic to get an employee by id
+    id = req.params.get('id')
+    with app.app_context():
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute('SELECT * FROM employee WHERE employeeid = %s', (id,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        response_data = jsonify(user).get_data(as_text=True)
+        return func.HttpResponse(response_data, mimetype="application/json", status_code=200)
+
+
+@employee_blueprint.route('employee-update', methods=['POST'])
+#@cross_origin()  # Enable CORS for this route
+#@token_required
+def update_employee(req: func.HttpRequest):
+    with app.app_context():
+        data = req.get_json()
+        conn = get_db_connection()
+        cursor = conn.cursor()
         cursor.execute(
-            'INSERT INTO employee (maincompanyid, joiningdate, employeename, age, contactno, address, nidnumber, salary, grade, roleid, state, description, image, createdat) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)',
-            (data['maincompanyid'], data['joiningdate'], data['employeename'], data['age'], data['contactno'], data['address'], data['nidnumber'], data['salary'], data['grade'], data['roleid'], data['state'], data['description'], data['image'])
+            'UPDATE employee SET maincompanyid = %s, joiningdate = %s, employeename = %s, age = %s, contactno = %s, address = %s, nidnumber = %s, salary = %s, grade = %s, roleid = %s, state = %s, description = %s, image = %s WHERE employeeid = %s',
+            (data['maincompanyid'], data['joiningdate'], data['employeename'], data['age'], data['contactno'], data['address'], data['nidnumber'], data['salary'], data['grade'], data['roleid'], data['state'], data['description'], data['image'], data['id'])
         )
         conn.commit()
-        return jsonify({'status': 'Employee added successfully'}), 201
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'error': str(e)}), 500
-    finally:
         cursor.close()
         conn.close()
-    pass
+        return func.HttpResponse(jsonify({'status': 'Employee updated'}).get_data(as_text=True), mimetype="application/json", status_code=200)
 
-@employee_blueprint.route('/employee/<maincompanyid>', methods=['GET'])
-@cross_origin()  # Enable CORS for this route
-@token_required
-def get_employees(maincompanyid):
-    # Implement the logic to get employees by maincompanyid
-    conn = get_db_connection()
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM employee where maincompanyid = %s', (maincompanyid))
-    users = cursor.fetchall()
-    print("users--",users)
-    cursor.close()
-    conn.close()
-    return jsonify(users), 200
+@employee_blueprint.route('employee', methods=['DELETE'])
+#@cross_origin()  # Enable CORS for this route
+#@token_required
+def delete_employee(req: func.HttpRequest):        
+    id = req.params.get('id')#request.args.get('id')
+    maincompanyid = req.params.get('maincompanyid')
+    with app.app_context():
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        error = False
+        try:
+            cursor.execute('DELETE FROM employee WHERE employeeid = %s', (id,))
+            conn.commit()
+            
+            # Fetch the updated list of sales order details
+            cursor.execute('SELECT * FROM employee where maincompanyid = %s', (maincompanyid))
+            roles = cursor.fetchall()
+        except psycopg2.Error as e:
+            error =True
+            conn.rollback()
+            print("error test is --",e)
+            return func.HttpResponse(jsonify({'message': str(e)}).get_data(as_text=True), mimetype="application/json", status_code=400)
 
-@employee_blueprint.route('/employee/getbyid', methods=['GET'])
-@cross_origin()  # Enable CORS for this route
-@token_required
-def get_employee_by_id():
-    # Implement the logic to get an employee by id
-    id = request.args.get('id')
-    conn = get_db_connection()
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM employee WHERE employeeid = %s', (id,))
-    user = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return jsonify(user), 200
-
-@employee_blueprint.route('/employee/update', methods=['POST'])
-@cross_origin()  # Enable CORS for this route
-@token_required
-def update_employee():
-    data = request.json
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        'UPDATE employee SET maincompanyid = %s, joiningdate = %s, employeename = %s, age = %s, contactno = %s, address = %s, nidnumber = %s, salary = %s, grade = %s, roleid = %s, state = %s, description = %s, image = %s WHERE employeeid = %s',
-        (data['maincompanyid'], data['joiningdate'], data['employeename'], data['age'], data['contactno'], data['address'], data['nidnumber'], data['salary'], data['grade'], data['roleid'], data['state'], data['description'], data['image'], data['id'])
-    )
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({'status': 'Employee updated'}), 200
-
-@employee_blueprint.route('/employee', methods=['DELETE'])
-@cross_origin()  # Enable CORS for this route
-@token_required
-def delete_employee():        
-    id = request.args.get('id')
-    maincompanyid = request.args.get('maincompanyid')
-    conn = get_db_connection()
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
-    error = False
-    try:
-        cursor.execute('DELETE FROM employee WHERE employeeid = %s', (id,))
-        conn.commit()
-        
-        # Fetch the updated list of sales order details
-        cursor.execute('SELECT * FROM employee where maincompanyid = %s', (maincompanyid))
-        roles = cursor.fetchall()
-    except psycopg2.Error as e:
-        error =True
-        conn.rollback()
-        print("error test is --",e)
-        return jsonify({'message': str(e)}), 400
-    finally:
-        cursor.close()
-        conn.close()
-        if not error:
-            return jsonify({'status': 'Employee deleted', 'data': roles}), 200
+        finally:
+            cursor.close()
+            conn.close()
+            if not error:
+                return func.HttpResponse(jsonify({'status': 'Employee deleted', 'data': roles}).get_data(as_text=True), mimetype="application/json", status_code=200)

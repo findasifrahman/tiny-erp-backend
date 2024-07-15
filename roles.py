@@ -102,4 +102,4 @@ def delete_role(req: func.HttpRequest):
             cursor.close()
             conn.close()
 
-        return func.HttpResponse(jsonify({'status': 'Sales Order Detail deleted', 'data': roles}).get_data(as_text=True), mimetype="application/json", status_code=200)
+        return func.HttpResponse(jsonify({'status': 'Roles deleted', 'data': roles}).get_data(as_text=True), mimetype="application/json", status_code=200)
