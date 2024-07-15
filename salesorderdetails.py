@@ -40,6 +40,9 @@ def get_salesorderdetails(req: func.HttpRequest):
     with app.app_context():
         conn = get_db_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
+        ###
+        ####
+
         cursor.execute('SELECT * FROM salesorderdetails where maincompanyid = %s', (maincompanyid))
         salesorderdetails = cursor.fetchall()
         cursor.close()
@@ -61,7 +64,8 @@ def get_salesorderdetail_by_id(req: func.HttpRequest):
         conn.close()
         if not salesorderdetail:
             return func.HttpResponse(jsonify({'message': 'Sales Order Detail not found'}).get_data(as_text=True), mimetype="application/json", status_code=404)
-        return func.HttpResponse(salesorderdetail, mimetype="application/json", status_code=200)
+        response_data = jsonify(salesorderdetail).get_data(as_text=True)
+        return func.HttpResponse(response_data, mimetype="application/json", status_code=200)
 
 @salesorderdetails_blueprint.route('salesorderdetails-update', methods=['POST'])
 #@cross_origin()

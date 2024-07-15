@@ -261,4 +261,5 @@ def getByDate_salesorders(req: func.HttpRequest):
         user = cursor.fetchall()
         cursor.close()
         conn.close()
-        return func.HttpResponse(user, mimetype="application/json", status_code=200)
+        response_data = jsonify(user).get_data(as_text=True)
+        return func.HttpResponse(response_data, mimetype="application/json", status_code=200)

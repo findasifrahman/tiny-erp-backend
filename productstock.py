@@ -1,5 +1,5 @@
-#productstock: productstockid int primary key, maincompanyid int not null unchangeable, purchasecategoryid int not null,
-#    purchasesubcategoryid int not null, quantity not null Int, unit not null varchar(15),entrydate timestamp, 
+#productstock: productstockid int primary key, maincompanyid int not null unchangeable, productcategoryid int not null,
+#    productsubcategoryid int not null, quantity not null Int, unit not null varchar(15),entrydate timestamp, 
 #    status not null varchar(100),description text, 
 #    createdat (TIMESTAMP)
 
@@ -10,7 +10,7 @@ from dbcon import get_db_connection
 from psycopg2.extras import RealDictCursor
 from auth import token_required
 import psycopg2
-
+import logging
 import azure.functions as func
 from mapp import create_app
 app = create_app()#Flask(__name__)
@@ -155,3 +155,60 @@ def delete_productstock(req: func.HttpRequest):
             conn.close()
             if not error:
                 return func.HttpResponse(jsonify({'status': 'productstock deleted', 'data': roles}).get_data(as_text=True), mimetype="application/json", status_code=200)
+
+@productstock_blueprint.route('productstock-getstock', methods=['GET'])
+#@cross_origin()
+#@token_required
+def getstock_productstock(req: func.HttpRequest):
+    maincompanyid = req.params.get('maincompanyid')
+    categoryid = req.params.get('categoryid')#request.args.get('id')
+    subcategoryid = req.params.get('subcategoryid')
+
+    logging.info(f'users_dispatcher is --------------------------- {req.params.get("maincompanyid")} ')
+    query = """
+    SELECT
+        (ps.quantity - COALESCE(SUM(sod.quantity), 0)) AS current_stock
+    FROM
+        productstock ps
+    LEFT JOIN
+        salesorderdetails sod
+    ON
+        ps.maincompanyid = sod.maincompanyid
+        AND ps.productcategoryid = sod.productcategoryid
+        AND ps.productsubcategoryid = sod.productsubcategoryid
+    WHERE
+        ps.maincompanyid = %s
+        AND ps.productcategoryid = %s
+        AND ps.productsubcategoryid = %s
+    GROUP BY
+        ps.productstockid,
+        ps.quantity;
+    """
+
+
+    with app.app_context():
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        error = False
+        try:
+            cursor.execute(query, (maincompanyid, categoryid, subcategoryid))
+            row = cursor.fetchall()
+            logging.info(f'result is is --------------------------- {row} ')
+
+        except psycopg2.Error as e:
+            error =True
+            conn.rollback()
+            print("error test is --",e)
+            return func.HttpResponse(jsonify({'message': str(e)}).get_data(as_text=True), mimetype="application/json", status_code=400)
+
+        finally:
+            cursor.close()
+            conn.close()
+            # Convert the result to a list of dictionaries
+            if row is None:
+                return func.HttpResponse(jsonify({'error': 'No data found for the specified parameters'}).get_data(as_text=True), mimetype="application/json", status_code=400)
+
+            current_stock = row[0]['current_stock']
+
+            if not error:
+                return func.HttpResponse(jsonify({'status': 'Stock Found', 'data': current_stock}).get_data(as_text=True), mimetype="application/json", status_code=200)

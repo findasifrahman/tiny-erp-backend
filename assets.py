@@ -53,18 +53,19 @@ def get_assets(req: func.HttpRequest):
 #@cross_origin()
 #@token_required
 def get_asset_by_id(req: func.HttpRequest):
-    id = request.args.get('id')
-    conn = get_db_connection()
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM assets WHERE assetentryid = %s', (id,))
-    asset = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    if not asset:
-        return func.HttpResponse(jsonify({'status': 'Asset not found'}).get_data(as_text=True), mimetype="application/json", status_code=404)
+    id = req.params.get('id')
+    with app.app_context():
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute('SELECT * FROM assets WHERE assetentryid = %s', (id,))
+        asset = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if not asset:
+            return func.HttpResponse(jsonify({'status': 'Asset not found'}).get_data(as_text=True), mimetype="application/json", status_code=404)
 
-    response_data = jsonify(asset).get_data(as_text=True)
-    return func.HttpResponse(response_data, mimetype="application/json", status_code=200)
+        response_data = jsonify(asset).get_data(as_text=True)
+        return func.HttpResponse(response_data, mimetype="application/json", status_code=200)
 
 
 @assets_blueprint.route('assets-update', methods=['POST'])
