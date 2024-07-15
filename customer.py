@@ -81,7 +81,7 @@ def update_customer(req: func.HttpRequest):
 #@cross_origin()  # Enable CORS for this route
 #@token_required
 def delete_customer(req: func.HttpRequest):
-    id = req.params.get('id')#request.args.get('id')
+    id = req.params.get('id')
     maincompanyid = req.params.get('maincompanyid')
     with app.app_context():
         conn = get_db_connection()
@@ -104,6 +104,6 @@ def delete_customer(req: func.HttpRequest):
             cursor.close()
             conn.close()
             if not error:
-                return func.HttpResponse(jsonify({'status': 'Customer deleted', 'data': roles}).get_data(as_text=True), mimetype="application/json", status_code=200)
+                return func.HttpResponse(jsonify({'status': 'Customer Deleted', 'data': roles}).get_data(as_text=True), mimetype="application/json", status_code=200)
 
         
