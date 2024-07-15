@@ -167,33 +167,33 @@ def getstock_productstock(req: func.HttpRequest):
     logging.info(f'users_dispatcher is --------------------------- {req.params.get("maincompanyid")} ')
     query = """
     SELECT
-        (ps.quantity - COALESCE(SUM(sod.quantity), 0)) AS current_stock
+        (COALESCE(ps.total_stock, 0) - COALESCE(sod.total_sold, 0)) AS current_stock
     FROM
-        productstock ps
+        (SELECT SUM(quantity) AS total_stock
+        FROM productstock
+        WHERE maincompanyid = %s
+        AND productcategoryid = %s
+        AND productsubcategoryid = %s) ps
     LEFT JOIN
-        salesorderdetails sod
-    ON
-        ps.maincompanyid = sod.maincompanyid
-        AND ps.productcategoryid = sod.productcategoryid
-        AND ps.productsubcategoryid = sod.productsubcategoryid
-    WHERE
-        ps.maincompanyid = %s
-        AND ps.productcategoryid = %s
-        AND ps.productsubcategoryid = %s
-    GROUP BY
-        ps.productstockid,
-        ps.quantity;
+        (SELECT SUM(quantity) AS total_sold
+        FROM salesorderdetails
+        WHERE maincompanyid = %s
+        AND productcategoryid = %s
+        AND productsubcategoryid = %s) sod
+    ON TRUE;
+
+
     """
 
 
     with app.app_context():
         conn = get_db_connection()
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor = conn.cursor()#cursor_factory=RealDictCursor)
         error = False
         try:
-            cursor.execute(query, (maincompanyid, categoryid, subcategoryid))
-            row = cursor.fetchall()
-            logging.info(f'result is is --------------------------- {row} ')
+            cursor.execute(query, (maincompanyid, categoryid, subcategoryid,maincompanyid, categoryid, subcategoryid))
+            row = cursor.fetchone()
+            logging.info(f'result is is --------------------------- {row[0]} ')
 
         except psycopg2.Error as e:
             error =True
@@ -208,7 +208,7 @@ def getstock_productstock(req: func.HttpRequest):
             if row is None:
                 return func.HttpResponse(jsonify({'error': 'No data found for the specified parameters'}).get_data(as_text=True), mimetype="application/json", status_code=400)
 
-            current_stock = row[0]['current_stock']
+            current_stock = row[0]
 
             if not error:
                 return func.HttpResponse(jsonify({'status': 'Stock Found', 'data': current_stock}).get_data(as_text=True), mimetype="application/json", status_code=200)
