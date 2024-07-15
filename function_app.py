@@ -158,7 +158,6 @@ async def login(req: func.HttpRequest):
         )
 
 @function_app.route(route="change-password", methods=["POST"])
-@cross_origin(origins="http://localhost:4200")
 async def change_password(req: func.HttpRequest):
     with app.app_context():
         data = req.get_json()
