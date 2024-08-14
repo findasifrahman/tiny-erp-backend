@@ -31,6 +31,7 @@ from officepurchaseitemlist import officepurchaseitemlist_blueprint
 from officeexpenditure import officeexpenditure_blueprint
 from assets import assets_blueprint
 from productstock import productstock_blueprint
+from purchasepayment import purchasepayment_blueprint
 
 
 
@@ -65,7 +66,7 @@ function_app.register_functions(officepurchaseitemlist_blueprint)
 function_app.register_functions(officeexpenditure_blueprint)
 function_app.register_functions(assets_blueprint)
 function_app.register_functions(productstock_blueprint)
-
+function_app.register_functions(purchasepayment_blueprint)
 ##
 '''
 def dispatch_request(req: func.HttpRequest, route_prefix: str):

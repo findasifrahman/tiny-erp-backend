@@ -61,3 +61,6 @@ productstock: productstockid int primary key, maincompanyid int not null unchang
     status not null varchar(100),description text, 
     createdat (TIMESTAMP)
 
+purchasepayment: purchasepaymentid int not null,maincompanyid int not null,amount not null int, supplierid not null int,
+paymentorderid int, paymentdate date not null, recievedby int not null, description text ,createdat timestamp  
+

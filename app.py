@@ -26,6 +26,7 @@ from officepurchaseitemlist import officepurchaseitemlist_blueprint
 from officeexpenditure import officeexpenditure_blueprint
 from assets import assets_blueprint
 from productstock import productstock_blueprint
+from purchasepayment import purchasepayment_blueprint
 from flask_cors import cross_origin
 
 app = func.FunctionApp()#Flask(__name__)
@@ -74,7 +75,7 @@ app.register_functions(officepurchaseitemlist_blueprint)
 app.register_functions(officeexpenditure_blueprint)
 app.register_functions(assets_blueprint)
 app.register_functions(productstock_blueprint)
-
+app.register_blueprint(purchasepayment_blueprint)
 # Dummy user data for authentication
 users = {
     "user1": "password1",

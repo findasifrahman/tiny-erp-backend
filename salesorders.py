@@ -67,7 +67,7 @@ def get_salesorders(req: func.HttpRequest):
             ) AS details
         FROM salesorder p
         LEFT JOIN salesorderdetails r ON p.salesorderid = r.salesorderid
-        WHERE p.maincompanyid = %s AND p.orderdate >= NOW() - INTERVAL '3 MONTHS'
+        WHERE p.maincompanyid = %s AND p.orderdate >= NOW() - INTERVAL '6 MONTHS'
         GROUP BY 
             p.salesorderid,
             p.maincompanyid,
